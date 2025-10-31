@@ -1,5 +1,6 @@
 // /api/simkl_callback.js
-import fetch from 'node-fetch'
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
   const { code } = req.query;
 
