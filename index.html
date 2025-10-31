@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simkl-Trakt Sync</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: grid;
+            place-items: center;
+            min-height: 90vh;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        h1 {
+            color: #111;
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .links {
+            margin-top: 2rem;
+        }
+        a {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #007bff;
+            transition: background-color 0.2s ease;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        a.simkl {
+            background-color: #E24A5A;
+        }
+        a.simkl:hover {
+            background-color: #c03948;
+        }
+        code {
+            display: block;
+            background-color: #eee;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-family: monospace;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Simkl-Trakt Sync</h1>
+        <p>This Vercel project automatically syncs your watched history from Simkl to Trakt.</p>
+        
+        <div class="links">
+            <p><strong>This page is for setup only.</strong><br>You must authenticate both services to get your tokens.</p>
+            
+            <a href="https://simkl.com/oauth/authorize?response_type=code&client_id=2e4d96434af69c1fe0a29aa1cd43f862fc6d6935be6ddd1a5b542f905f94f193&redirect_uri=https://simkl-trakt-sync.vercel.app/api/simkl_callback" class="simkl">
+                1. Authenticate with Simkl
+            </a>
+            
+            <a href="https://trakt.tv/oauth/authorize?response_type=code&client_id=34a0a1cda8aa7e0003e2a7304af2b7bfc77a32ae14268d4665434e4aa932c659&redirect_uri=https://simkl-trakt-sync.vercel.app/api/callback">
+                2. Authenticate with Trakt
+            </a>
+        </div>
+        
+        <code>
+            The automatic sync runs from: /api/sync
+        </code>
+    </div>
+</body>
+</html>
