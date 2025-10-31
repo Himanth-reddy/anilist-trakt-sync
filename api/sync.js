@@ -1,6 +1,3 @@
-// /api/sync.js
-import fetch from 'node-fetch';
-
 export default async function handler(req, res) {
   try {
     // Fetch watched shows from Simkl
