@@ -1,15 +1,28 @@
 export default async function handler(req, res) {
   try {
-    // Fetch watched shows from Simkl
+    // 1️⃣ Fetch watched shows from Simkl
     const simklResponse = await fetch('https://api.simkl.com/sync/all-items', {
       headers: {
         'Content-Type': 'application/json',
-        'simkl-api-key': process.env.SIMKL_API_KEY
+        'simkl-api-key': process.env.SIMKL_API_KEY,
+        'Authorization': `Bearer ${process.env.SIMKL_ACCESS_TOKEN || ''}`,
       }
     });
-    const simklData = await simklResponse.json();
 
-    // Example: sync shows to Trakt (you can expand later)
+    const simklText = await simklResponse.text(); // log raw response
+    console.log('Simkl response:', simklText);
+
+    let simklData;
+    try {
+      simklData = JSON.parse(simklText);
+    } catch (err) {
+      return res.status(500).json({
+        error: 'Failed to parse Simkl JSON',
+        details: simklText,
+      });
+    }
+
+    // 2️⃣ Push to Trakt
     const traktResponse = await fetch('https://api.trakt.tv/sync/history', {
       method: 'POST',
       headers: {
@@ -19,21 +32,18 @@ export default async function handler(req, res) {
         'trakt-api-key': process.env.TRAKT_CLIENT_ID
       },
       body: JSON.stringify({
-        shows: simklData.shows?.map(show => ({
-          ids: { slug: show.show.slug },
+        shows: simklData?.shows?.map(show => ({
+          ids: { slug: show.show?.slug },
           watched_at: new Date().toISOString()
-        }))
+        })) || []
       })
     });
 
-    const traktData = await traktResponse.json();
+    const traktText = await traktResponse.text();
+    console.log('Trakt response:', traktText);
 
     return res.status(200).json({
       message: 'Sync complete',
-      traktResponse: traktData
+      traktResponse: traktText
     });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Sync failed', details: err.message });
-  }
-}
+  } catch (err
