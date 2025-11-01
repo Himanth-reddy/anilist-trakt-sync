@@ -2,86 +2,67 @@
 import fetch from 'node-fetch';
 
 /**
- * Transforms Simkl items (shows, anime, movies) into a format
- * that the Trakt API /sync/watched endpoint understands.
+ * Fetches the recent anime watch history from Simkl (last 24 hours).
  */
-function transformSimklToTrakt(simklData) {
-  const traktPayload = {
-    movies: [],
-    shows: [], // Trakt treats anime as 'shows'
-  };
+async function getSimklHistory() {
+  // 1. Get the date from 25 hours ago to make sure we don't miss anything
+  const sinceDate = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+  
+  const endpoint = `https://api.simkl.com/sync/history/anime?watched_at=${sinceDate}`;
+  
+  const response = await fetch(endpoint, {
+    headers: {
+      'Content-Type': 'application/json',
+      'simkl-api-key': process.env.SIMKL_CLIENT_ID,
+      'Authorization': `Bearer ${process.env.SIMKL_ACCESS_TOKEN}`,
+    }
+  });
 
-  // Process Movies
-  if (simklData.movies) {
-    traktPayload.movies = simklData.movies
-      .filter(item => item.status === 'watched')
-      .map(item => ({
-        ids: {
-          imdb: item.movie.ids.imdb,
-          tmdb: item.movie.ids.tmdb,
-        }
-      }));
+  if (!response.ok) {
+    console.error(`Failed to fetch ${endpoint}:`, await response.text());
+    return []; // Return empty array on failure
   }
-
-  // Process TV Shows
-  if (simklData.shows) {
-    const shows = simklData.shows
-      .filter(item => item.status === 'watched')
-      .map(item => ({
-        ids: {
-          imdb: item.show.ids.imdb,
-          tvdb: item.show.ids.tvdb,
-          tmdb: item.show.ids.tmdb,
-        }
-      }));
-    traktPayload.shows.push(...shows);
-  }
-
-  // Process Anime
-  if (simklData.anime) {
-    const anime = simklData.anime
-      .filter(item => item.status === 'watched')
-      .map(item => ({
-        ids: {
-          tvdb: item.show.ids.tvdb,
-          tmdb: item.show.ids.tmdb,
-          imdb: item.show.ids.imdb,
-        }
-      }));
-    traktPayload.shows.push(...anime);
-  }
-
-  return traktPayload;
+  return await response.json();
 }
 
+/**
+ * Transforms Simkl history items into the Trakt history format.
+ */
+function transformHistoryToTrakt(items) {
+  return items.map(item => ({
+    watched_at: item.watched_at, // <-- This is the timestamp!
+    ids: {
+      imdb: item.show?.ids?.imdb,
+      tmdb: item.show?.ids?.tmdb,
+      tvdb: item.show?.ids?.tvdb,
+    }
+  }));
+}
 
 export default async function handler(req, res) {
   try {
-    // 1. Fetch all items from Simkl
-    const simklResponse = await fetch('https://api.simkl.com/sync/all-items', {
-      headers: {
-        'Content-Type': 'application/json',
-        'simkl-api-key': process.env.SIMKL_CLIENT_ID, 
-        'Authorization': `Bearer ${process.env.SIMKL_ACCESS_TOKEN}`,
-      }
-    });
+    // 1. Fetch all RECENTLY WATCHED anime from Simkl
+    const animeHistory = await getSimklHistory();
 
-    if (!simklResponse.ok) {
-      const errorText = await simklResponse.text();
-      console.error('Simkl API error:', errorText);
-      return res.status(simklResponse.status).json({ error: 'Failed to fetch from Simkl', details: errorText });
-    }
-    const simklData = await simklResponse.json();
+    // 2. Create a human-readable list for the response
+    const syncedItemsList = animeHistory.map(item => 
+      `${item.show.title} (S${item.episode.season} E${item.episode.number})`
+    );
 
-    // 2. Transform the data for Trakt
-    const traktBody = transformSimklToTrakt(simklData);
-
-    if (traktBody.movies.length === 0 && traktBody.shows.length === 0) {
-      return res.status(200).json({ message: 'No new watched items to sync from Simkl.' });
+    if (syncedItemsList.length === 0) {
+      return res.status(200).json({ 
+        message: 'No new anime watch history found in the last 25 hours.' 
+      });
     }
 
-    // 3. Push to Trakt
-    const traktResponse = await fetch('https://api.trakt.tv/sync/watched', {
+    // 3. Transform the data into the Trakt format
+    const traktPayload = {
+      shows: transformHistoryToTrakt(animeHistory),
+      movies: [] // Always empty
+    };
+    
+    // 4. Push to Trakt's HISTORY endpoint
+    const traktResponse = await fetch('https://api.trakt.tv/sync/history', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,20 +70,22 @@ export default async function handler(req, res) {
         'trakt-api-version': '2',
         'trakt-api-key': process.env.TRAKT_CLIENT_ID
       },
-      body: JSON.stringify(traktBody)
+      body: JSON.stringify(traktPayload)
     });
 
     if (!traktResponse.ok) {
       const errorText = await traktResponse.text();
       console.error('Trakt API error:', errorText);
-      return res.status(traktResponse.status).json({ error: 'Failed to push to Trakt', details: errorText });
+      return res.status(traktResponse.status).json({ error: 'Failed to push history to Trakt', details: errorText });
     }
 
     const traktData = await traktResponse.json();
     
+    // 5. Send the final, detailed response
     return res.status(200).json({
-      message: 'Sync complete',
-      traktResponse: traktData
+      message: `Timestamped history sync complete! Synced ${syncedItemsList.length} anime episode(s).`,
+      synced_items: syncedItemsList,
+      trakt_response: traktData
     });
 
   } catch (err) {
