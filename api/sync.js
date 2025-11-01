@@ -1,8 +1,9 @@
-// sync.js
-const fetch = require('node-fetch');
-require('dotenv').config(); // Load all variables from your .env file
+// /api/sync.js
+import fetch from 'node-fetch';
 
 // --- Reusable API Helpers ---
+// Note: We define these outside the handler so they are globally available.
+// process.env variables are automatically injected by Vercel.
 
 const SIMKL_HEADERS = {
   'Content-Type': 'application/json',
@@ -17,6 +18,10 @@ const TRAKT_HEADERS = {
   'trakt-api-key': process.env.TRAKT_CLIENT_ID,
 };
 
+/**
+ * A robust helper to get data from Simkl.
+ * Always returns an array, even on failure.
+ */
 async function getSimklData(endpoint) {
   try {
     const response = await fetch(`https://api.simkl.com${endpoint}`, { headers: SIMKL_HEADERS });
@@ -25,14 +30,31 @@ async function getSimklData(endpoint) {
       return [];
     }
     const data = await response.json();
-    // This check is the fix for the ".map is not a function" error
-    return Array.isArray(data) ? data : [];
+    
+    // Handle `null` response
+    if (data === null) {
+      return [];
+    }
+    // Handle object response like { "anime": [...] }
+    if (data.anime && Array.isArray(data.anime)) {
+      return data.anime;
+    }
+    // Handle direct array response [...]
+    if (Array.isArray(data)) {
+      return data;
+    }
+    // Fallback for other weird (but ok) responses
+    return [];
+
   } catch (err) {
     console.error(`🔴 Simkl Fetch Error ${endpoint}:`, err.message);
     return [];
   }
 }
 
+/**
+ * A robust helper to post data to Trakt.
+ */
 async function postToTrakt(endpoint, payload) {
   try {
     const response = await fetch(`https://api.trakt.tv${endpoint}`, {
@@ -53,7 +75,7 @@ async function postToTrakt(endpoint, payload) {
 
 // --- Sync Function 1: HISTORY (Recent Scrobbles) ---
 async function runHistorySync() {
-  // Look back 73 hours (3 days) to find recent items like "One Punch Man"
+  // Look back 73 hours (3 days) to find recent items
   const sinceDate = new Date(Date.now() - 73 * 60 * 60 * 1000).toISOString();
   
   const history = await getSimklData(`/sync/history/anime?watched_at=${sinceDate}`);
@@ -133,9 +155,8 @@ async function runWatchlistSync() {
 }
 
 
-// --- Main Handler ---
-async function main() {
-  console.log('--- Starting Simkl-to-Trakt Sync (History, Ratings, Watchlist) ---');
+// --- Main Vercel Handler ---
+export default async function handler(req, res) {
   try {
     // Run all syncs at the same time
     const [
@@ -149,17 +170,18 @@ async function main() {
     ]);
 
     // Return the detailed report
-    console.log('✅ Full sync complete. See report below:');
-    console.log(JSON.stringify({
-      history: historyResult,
-      ratings: ratingsResult,
-      watchlist: watchlistResult,
-    }, null, 2));
+    return res.status(200).json({
+      message: 'Full sync complete.',
+      details: {
+        history: historyResult,
+        ratings: ratingsResult,
+        watchlist: watchlistResult,
+      }
+    });
 
   } catch (err) {
     console.error('🔴 A fatal error occurred:');
     console.error(err.message);
+    return res.status(500).json({ error: 'Sync process failed', details: err.message });
   }
 }
-
-main();
