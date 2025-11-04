@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simkl-Trakt Sync</title>
+    <title>Anilist-Trakt Sync</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -45,11 +45,11 @@
         a:hover {
             background-color: #0056b3;
         }
-        a.simkl {
-            background-color: #E24A5A;
+        a.manual-sync {
+            background-color: #28a745; /* Green */
         }
-        a.simkl:hover {
-            background-color: #c03948;
+        a.manual-sync:hover {
+            background-color: #218838;
         }
         code {
             display: block;
@@ -58,29 +58,37 @@
             border-radius: 5px;
             margin-top: 1rem;
             font-family: monospace;
+            text-align: left;
             word-wrap: break-word;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎬 Simkl-Trakt Sync</h1>
-        <p>This Vercel project automatically syncs your watched history from Simkl to Trakt.</p>
+        <h1>🚀 Anilist-Trakt Sync</h1>
+        <p>This project automatically syncs your scrobble history from Anilist to Trakt.</p>
         
         <div class="links">
-            <p><strong>This page is for setup only.</strong><br>You must authenticate both services to get your tokens.</p>
+            <p><strong>This page is for setup and manual runs.</strong><br>The automatic sync runs once per day.</p>
             
-            <a href="https://simkl.com/oauth/authorize?response_type=code&client_id=2e4d96434af69c1fe0a29aa1cd43f862fc6d6935be6ddd1a5b542f905f94f193&redirect_uri=https://simkl-trakt-sync.vercel.app/api/simkl_callback" class="simkl">
-                1. Authenticate with Simkl
+            <a href="https://trakt.tv/oauth/authorize?response_type=code&client_id=34a0a1cda8aa7e0003e2a7304af2b7bfc77a32ae14268d4665434e4aa932c659&redirect_uri=https://anilist-trakt-sync.vercel.app/api/callback">
+                1. Get Trakt Access Token (One-Time Setup)
             </a>
             
-            <a href="https://trakt.tv/oauth/authorize?response_type=code&client_id=34a0a1cda8aa7e0003e2a7304af2b7bfc77a32ae14268d4665434e4aa932c659&redirect_uri=https://simkl-trakt-sync.vercel.app/api/callback">
-                2. Authenticate with Trakt
+            <a href="/api/sync" class="manual-sync">
+                2. Run Manual Sync
             </a>
         </div>
         
         <code>
-            The automatic sync runs from: /api/sync
+            <strong>One-Time Setup Instructions:</strong><br><br>
+            1. Go to your new Vercel project's **Settings -> Environment Variables**.<br><br>
+            2. Add all your keys from your local `.env` file (like `TRAKT_CLIENT_ID`, `TRAKT_CLIENT_SECRET`, `SIMKL_CLIENT_ID`).<br><br>
+            3. Add your **`ANILIST_ACCESS_TOKEN`** (the long one from your local tests).<br><br>
+            4. In the HTML for this file, find the link for "Get Trakt Access Token" and **replace** `YOUR-NEW-PROJECT-URL` with your actual Vercel URL.<br><br>
+            5. Click the "Get Trakt Access Token" button. It will give you a JSON page. Copy the `access_token` value.<br><br>
+            6. Go back to Vercel and add a new variable: **`TRAKT_ACCESS_TOKEN`**. Paste the token there.<br><br>
+            7. In Vercel, go to the "Deployments" tab and **Redeploy** the project to load all the new tokens.
         </code>
     </div>
 </body>
