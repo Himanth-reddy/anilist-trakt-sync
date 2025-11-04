@@ -1,5 +1,5 @@
 {
-  "name": "simkl-trakt-sync",
+  "name": "anilist-trakt-sync",
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
