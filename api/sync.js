@@ -128,9 +128,16 @@ export default async function handler(req, res) {
 
         // 8. Save our new "last synced" time to Vercel KV
         // We use the timestamp of the *last* item we processed
-        const newTimestamp = newScrobbles[newScrobbles.length - 1].createdAt;
-        await kv.set('lastSyncTimestamp', newTimestamp);
-        console.log(`[Sync] Saved new lastSyncTimestamp: ${newTimestamp}`);
+        if (newScrobbles.length > 0) {
+            // We use the timestamp of the *last* item we found in the new batch
+            const newTimestamp = newScrobbles[newScrobbles.length - 1].createdAt;
+            if (newTimestamp) {
+                await kv.set('lastSyncTimestamp', newTimestamp);
+                console.log(`[Sync] Saved new lastSyncTimestamp: ${newTimestamp}`);
+            } else {
+                console.warn("[Sync] Could not save new timestamp, 'createdAt' was missing.");
+            }
+        }
 
         // 9. Send success response
         console.log("--- Sync Complete ---");
