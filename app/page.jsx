@@ -19,7 +19,7 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetch('/api/refresh-fribbs?check=1').then(r => r.json()).then(setStatus).catch(() => { });
+    fetch('/api/refresh-fribbs?check=1', { cache: 'no-store' }).then(r => r.json()).then(setStatus).catch(() => { });
   }, []);
 
   return (

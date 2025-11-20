@@ -1,8 +1,11 @@
 import { refreshFribbsCache } from '../../../lib/fribbs.js';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url || 'http://localhost');
+    console.log('[API] Refresh Fribbs called. URL:', request.url);
+    const { searchParams } = new URL(request.url);
     if (searchParams.get('check')) {
       const { kv } = await import('../../../utils/kv.js');
       const lastSync = await kv.get('status:fribbs:last-sync');
