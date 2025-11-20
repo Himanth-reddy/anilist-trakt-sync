@@ -121,22 +121,20 @@ export default function SyncPage() {
             <div className="bg-gray-800 p-6 rounded-lg mb-6">
                 <h3 className="text-xl font-semibold mb-4">Full AniList Sync</h3>
                 <div className="bg-yellow-900/30 border border-yellow-800 p-3 rounded mb-4 text-sm">
-                    <p className="font-medium text-yellow-300 mb-1">⚠️ Important Workflow</p>
-                    <p className="text-gray-300">
-                        Before using full sync, you should first sync individual shows using "Sync Single Show" above.
-                        This creates the AniList → Trakt ID mappings. Full sync will only work for shows that have already been mapped.
-                    </p>
+                    <p className="font-medium text-yellow-300 mb-1">⚠️ Important Setup</p>
+                    <ol className="text-gray-300 list-decimal list-inside space-y-1">
+                        <li>First, refresh the Fribbs database using the <strong>Dashboard</strong> page</li>
+                        <li>Ensure <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> are set in Vercel</li>
+                        <li>The system will automatically find Trakt IDs for your shows</li>
+                    </ol>
                 </div>
-                <p className="text-gray-400 mb-4 text-sm">
-                    Syncs all your watched episodes from AniList to Trakt. This requires <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> to be configured.
-                </p>
 
                 <button
                     onClick={syncAll}
                     disabled={fullLoading}
                     className={`px-6 py-2 rounded font-medium transition-colors ${fullLoading
-                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
+                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                            : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                 >
                     {fullLoading ? 'Syncing...' : 'Sync All Watched'}
