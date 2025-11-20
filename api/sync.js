@@ -2,7 +2,7 @@
 // This is the main "brain" of our application.
 // It's a serverless function that runs on a schedule or when you visit its URL.
 
-import { kv } from '../lib/kv-client.js';
+import { kv } from '../utils/kv.js';
 import { getNewAnilistScrobbles } from '../lib/anilist.js';
 import { translateShowIds } from '../lib/id-translator.js';
 import { getBreakpointMap } from '../lib/map-builder.js';
@@ -22,32 +22,32 @@ function translateAnilistToTrakt(scrobble, idCache, breakpointMap) {
     // Loop backwards through the breakpoint map to find the correct season
     // This is your "Breakpoint Map" logic in action
     let traktSeason = 1; // Default to season 1
-    
+
     // We reverse the map to find the largest 'starts_at' that is less than or equal to the episode number
     // e.g., for Ep 1071, it will check S22 (starts > 1071), then S21 (starts <= 1071) -> BINGO!
     const reversedMap = [...breakpointMap].reverse();
-    
+
     for (const entry of reversedMap) {
         if (anilistEpisodeNum >= entry.starts_at) {
             traktSeason = entry.season;
             break; // Found the correct season
         }
     }
-    
+
     // For Trakt, "Naruto" (S2, E1) is just "1". "One Piece" (S2, E62) is just "62".
     // Trakt's API handles the numbering *within* the season correctly,
     // so we just pass the original absolute number.
     // Our map's only job was to find the correct *season* number.
-    
+
     // CORRECTION: This is simpler. Trakt's map for "Naruto" (S1, S2, etc.)
     // *all* start at episode 1. So we MUST translate.
     // Let's refine the logic.
-    
+
     let traktEpisodeNum = anilistEpisodeNum;
-    
+
     // Find the correct season entry from the original map
     const seasonEntry = breakpointMap.find(s => s.season === traktSeason);
-    
+
     if (seasonEntry && seasonEntry.starts_at > 1) {
         // This is a "One Piece" / "Shippuden" style show
         // Trakt's number (e.g., 1071) is the same as Anilist's.
@@ -56,7 +56,7 @@ function translateAnilistToTrakt(scrobble, idCache, breakpointMap) {
         // This is a "Naruto" style show, where Trakt's S2 starts at E1.
         // We need to find the *offset*.
         // This is more complex, let's simplify for now.
-        
+
         // --- SIMPLIFIED LOGIC ---
         // For 99% of shows (Naruto, Bleach, One Piece), the episode number
         // on Trakt is the SAME as the absolute number from Anilist.
@@ -79,7 +79,7 @@ function translateAnilistToTrakt(scrobble, idCache, breakpointMap) {
 export default async function handler(req, res) {
     console.log("--- Starting Anilist-to-Trakt Sync ---");
     let lastSyncTimestamp;
-    
+
     try {
         // 1. Get the last time we synced from Vercel KV
         lastSyncTimestamp = await kv.get('lastSyncTimestamp') || 0;
@@ -87,19 +87,19 @@ export default async function handler(req, res) {
 
         // 2. Get all new scrobbles from Anilist since that time
         const newScrobbles = await getNewAnilistScrobbles(lastSyncTimestamp);
-        
+
         if (newScrobbles.length === 0) {
             console.log("[Sync] No new scrobbles found on Anilist.");
             return res.status(200).json({ message: "No new scrobbles from Anilist. Sync complete." });
         }
-        
+
         console.log(`[Sync] Found ${newScrobbles.length} new scrobbles to process.`);
         let translatedEpisodes = [];
 
         // 3. Loop and translate each new scrobble
         for (const scrobble of newScrobbles) {
             console.log(`[Sync] Processing: ${scrobble.showTitle} - Ep ${scrobble.episodeNumber}`);
-            
+
             // 4. Get ID Map (from cache or fetch new)
             // This calls your 'lib/id-translator.js' script
             const idCache = await translateShowIds(scrobble.anilistShowId);
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
             translatedEpisodes.push(traktEpisode);
             console.log(`[Sync] -> Mapped to Trakt: Show ${traktEpisode.traktShowId}, S${traktEpisode.season} E${traktEpisode.number}`);
         }
-        
+
         // 7. Batch POST to Trakt
         // This calls your 'lib/trakt.js' script
         const postResult = await postToTrakt(translatedEpisodes);
@@ -147,13 +147,13 @@ export default async function handler(req, res) {
             found: newScrobbles.length,
             synced: translatedEpisodes.length
         });
-        
+
     } catch (err) {
         console.error('--- A FATAL SYNC ERROR OCCURRED ---');
         console.error(err);
-        return res.status(500).json({ 
-            error: 'Sync process failed', 
-            details: err.message 
+        return res.status(500).json({
+            error: 'Sync process failed',
+            details: err.message
         });
     }
 }

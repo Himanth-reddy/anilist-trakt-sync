@@ -1,8 +1,8 @@
 // _test-full-sync.js
-// This is our main end-to-end test script.
+// This is a standalone test script to verify the full sync flow works.
 // It simulates a single "Naruto" scrobble from Anilist.
 
-import { kv } from './lib/kv-client.js';
+import { kv } from './utils/kv.js';
 import { translateShowIds } from './lib/id-translator.js';
 import { getBreakpointMap } from './lib/map-builder.js';
 import { postToTrakt } from './lib/trakt.js';
@@ -14,21 +14,21 @@ function translateEpisode(scrobble, breakpointMap) {
 
     let traktSeason = 1; // Default
     const reversedMap = [...breakpointMap].reverse();
-    
+
     for (const entry of reversedMap) {
         if (anilistEpisodeNum >= entry.starts_at) {
             traktSeason = entry.season;
-            break; 
+            break;
         }
     }
-    
+
     // As we discovered, for all major anime, the 'number' Trakt expects
     // is the same as the Anilist 'absolute' number.
     // Our map's ONLY job is to find the correct 'season'.
     const traktEpisodeNum = anilistEpisodeNum;
 
     console.log(`[TRANSLATE] Anilist Ep ${anilistEpisodeNum} -> Trakt S${traktSeason} E${traktEpisodeNum}`);
-    
+
     return {
         traktShowId: scrobble.traktShowId, // We'll add this to the scrobble
         season: traktSeason,
@@ -65,7 +65,7 @@ async function runFullTest() {
     console.log(`[TEST] Found Trakt ID: ${idMap.trakt}`);
     // Add the Trakt ID to our scrobble object for the next steps
     fakeAnilistScrobble.traktShowId = idMap.trakt;
-    
+
     // 3. STEP 2: GET EPISODE MAP
     // This will call 'lib/map-builder.js'
     // It will hit the cache (if it exists) or fetch from Trakt.
