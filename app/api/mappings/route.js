@@ -2,37 +2,37 @@ import { kv } from '../../../utils/kv.js';
 
 export async function GET() {
   try {
-    const indexKey = 'map:anilist:index';
-    const rawIndex = await kv.get(indexKey);
-    let list = [];
-    if (!rawIndex) list = [];
-    else if (typeof rawIndex === 'string') {
-      try {
-        const parsed = JSON.parse(rawIndex);
-        if (parsed?.value) list = JSON.parse(parsed.value);
-        else list = parsed;
-      } catch { list = [rawIndex]; }
-    } else if (typeof rawIndex === 'object' && rawIndex.value) {
-      try { list = JSON.parse(rawIndex.value); } catch { list = []; }
-    } else if (Array.isArray(rawIndex)) list = rawIndex;
+    // Fetch manual and automatic mapping keys
+    const manualKeys = await kv.keys('manual:map:*');
+    const autoKeys = await kv.keys('map:anilist:*');
 
-    if (!Array.isArray(list)) list = [];
+    // Helper to fetch and parse mapping data
+    const fetchMappings = async (keys, keyPrefix) => {
+      const mappings = [];
+      for (const key of keys) {
+        const raw = await kv.get(key);
+        if (!raw) continue;
 
-    const out = [];
-    for (const key of list) {
-      const entryRaw = await kv.get(key);
-      if (!entryRaw) continue;
-      let data = null;
-      if (typeof entryRaw === 'string') {
-        try { data = JSON.parse(entryRaw); } catch { data = { raw: entryRaw }; }
-      } else if (typeof entryRaw === 'object' && entryRaw.value) {
-        try { data = JSON.parse(entryRaw.value); } catch { data = { raw: entryRaw.value }; }
-      } else data = entryRaw;
+        let data = null;
+        if (typeof raw === 'string') {
+          try { data = JSON.parse(raw); } catch { data = { raw }; }
+        } else if (typeof raw === 'object' && raw.value) {
+          try { data = JSON.parse(raw.value); } catch { data = { raw: raw.value }; }
+        } else {
+          data = raw;
+        }
 
-      out.push({ anilistId: key.split(':')[2], ...data });
-    }
+        // Extract anilistId from key
+        const anilistId = key.replace(keyPrefix, '');
+        mappings.push({ anilistId, ...data });
+      }
+      return mappings;
+    };
 
-    return Response.json(out);
+    const manual = await fetchMappings(manualKeys, 'manual:map:');
+    const auto = await fetchMappings(autoKeys, 'map:anilist:');
+
+    return Response.json({ manual, auto });
   } catch (err) {
     console.error('/api/mappings error', err);
     return Response.json({ error: err.message }, { status: 500 });
