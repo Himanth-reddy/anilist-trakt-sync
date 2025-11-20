@@ -133,14 +133,17 @@ export default function SyncPage() {
                     onClick={syncAll}
                     disabled={fullLoading}
                     className={`px-6 py-2 rounded font-medium transition-colors ${fullLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                 >
                     {fullLoading ? 'Syncing...' : 'Sync All Watched'}
                 </button>
 
                 <ResultDisplay result={fullResult} />
+                {fullResult?.lastRun && (
+                    <p className="text-xs text-gray-500 mt-2 text-right">Last run: {new Date(fullResult.lastRun).toLocaleString()}</p>
+                )}
             </div>
 
             {/* Info Section */}

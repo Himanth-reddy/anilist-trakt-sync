@@ -4,6 +4,14 @@ import React from 'react';
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
 export default function RootLayout({ children }) {
+  React.useEffect(() => {
+    // Ping cron every minute to check if sync is needed
+    const interval = setInterval(() => {
+      fetch('/api/cron').catch(console.error);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <html lang="en">
       <body className="bg-gray-900 text-white min-h-screen">

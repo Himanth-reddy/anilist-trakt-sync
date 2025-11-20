@@ -18,6 +18,10 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    fetch('/api/refresh-fribbs?check=1').then(r => r.json()).then(setStatus).catch(() => { });
+  }, []);
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">System Status</h2>
@@ -29,8 +33,8 @@ export default function Page() {
             onClick={refreshFribbs}
             disabled={loading}
             className={`px-4 py-2 rounded font-medium transition-colors ${loading
-                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
           >
             {loading ? 'Refreshing...' : 'Refresh Fribbs'}
@@ -46,7 +50,7 @@ export default function Page() {
             <div className="space-y-2">
               <p className="text-green-400 font-medium">✓ Database Updated</p>
               <p>Total Entries: <span className="font-mono text-lg">{status.count?.toLocaleString() ?? '0'}</span></p>
-              <p className="text-sm text-gray-400">Last synced: {new Date().toLocaleString()}</p>
+              <p className="text-sm text-gray-400">Last synced: {status.lastSync ? new Date(status.lastSync).toLocaleString() : 'Never'}</p>
             </div>
           )
         ) : (

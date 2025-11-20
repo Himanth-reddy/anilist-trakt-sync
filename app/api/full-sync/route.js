@@ -101,6 +101,7 @@ export async function GET() {
         }
 
         console.log('[Full Sync] Complete');
+        await kv.set('status:sync:last-run', new Date().toISOString());
         return Response.json({
             message: 'Sync complete!',
             found: newScrobbles.length,
