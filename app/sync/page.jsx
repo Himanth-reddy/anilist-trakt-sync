@@ -33,7 +33,20 @@ export default function SyncPage() {
         setFullResult(null);
         try {
             const res = await fetch('/api/full-sync');
-            const data = await res.json();
+            const text = await res.text();
+
+            // Try to parse as JSON
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                // If JSON parsing fails, show the raw response
+                setFullResult({
+                    error: `API returned non-JSON response: ${text.substring(0, 200)}${text.length > 200 ? '...' : ''}`
+                });
+                return;
+            }
+
             setFullResult(data);
         } catch (e) {
             setFullResult({ error: e.message });
@@ -56,9 +69,15 @@ export default function SyncPage() {
         return (
             <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800">
                 <p className="font-medium mb-2">✓ Sync Successful</p>
-                {result.count && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
-                {result.synced !== undefined && <p>Shows processed: <span className="font-mono">{result.synced}</span></p>}
+                {result.count !== undefined && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
+                {result.synced !== undefined && <p>Episodes processed: <span className="font-mono">{result.synced}</span></p>}
+                {result.found !== undefined && <p>Scrobbles found: <span className="font-mono">{result.found}</span></p>}
                 {result.message && <p className="text-sm mt-2 text-green-300">{result.message}</p>}
+                {result.added && result.added.episodes !== undefined && (
+                    <p className="text-sm mt-2 font-medium">
+                        Posted to Trakt: <span className="font-mono">{result.added.episodes}</span> episodes
+                    </p>
+                )}
             </div>
         );
     };
@@ -87,8 +106,8 @@ export default function SyncPage() {
                         onClick={syncShow}
                         disabled={manualLoading}
                         className={`px-6 py-2 rounded font-medium transition-colors ${manualLoading
-                                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
                     >
                         {manualLoading ? 'Syncing...' : 'Sync Show'}
@@ -101,16 +120,23 @@ export default function SyncPage() {
             {/* Full Sync Section */}
             <div className="bg-gray-800 p-6 rounded-lg mb-6">
                 <h3 className="text-xl font-semibold mb-4">Full AniList Sync</h3>
+                <div className="bg-yellow-900/30 border border-yellow-800 p-3 rounded mb-4 text-sm">
+                    <p className="font-medium text-yellow-300 mb-1">⚠️ Important Workflow</p>
+                    <p className="text-gray-300">
+                        Before using full sync, you should first sync individual shows using "Sync Single Show" above.
+                        This creates the AniList → Trakt ID mappings. Full sync will only work for shows that have already been mapped.
+                    </p>
+                </div>
                 <p className="text-gray-400 mb-4 text-sm">
-                    Sync all your watched episodes from AniList to Trakt. This requires <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> to be configured.
+                    Syncs all your watched episodes from AniList to Trakt. This requires <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> to be configured.
                 </p>
 
                 <button
                     onClick={syncAll}
                     disabled={fullLoading}
                     className={`px-6 py-2 rounded font-medium transition-colors ${fullLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                 >
                     {fullLoading ? 'Syncing...' : 'Sync All Watched'}
