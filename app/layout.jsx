@@ -11,6 +11,7 @@ export default function RootLayout({ children }) {
           <h1 className="text-lg font-bold">AniList ↔ Trakt Sync</h1>
           <div className="space-x-4">
             <a href="/" className="hover:text-blue-400">Dashboard</a>
+            <a href="/sync" className="hover:text-blue-400">Sync</a>
             <a href="/mappings" className="hover:text-blue-400">Mappings</a>
             <a href="/manual" className="hover:text-blue-400">Manual Map</a>
             <a href="/logs" className="hover:text-blue-400">Logs</a>
