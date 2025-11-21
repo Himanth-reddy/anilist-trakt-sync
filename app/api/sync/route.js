@@ -1,5 +1,7 @@
 import { syncShow } from '../../../lib/sync-engine.js';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);

@@ -4,6 +4,8 @@ import { resolveTraktId } from '../../../lib/id-translator.js';
 import { getBreakpointMap } from '../../../lib/map-builder.js';
 import { postToTrakt } from '../../../lib/trakt.js';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Translates an Anilist scrobble into a Trakt-ready scrobble object.
  */

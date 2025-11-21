@@ -1,5 +1,7 @@
 import { kv } from '../../../utils/kv.js';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Fetch manual and automatic mapping keys
