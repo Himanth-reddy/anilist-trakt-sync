@@ -9,79 +9,111 @@ const supabase = (supabaseUrl && supabaseKey)
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-export const kv = {
-  async get(key) {
-    if (!supabase) return null;
-
-    try {
-      const { data, error } = await supabase
-        .from('kv_store')
-        .select('value')
-        .eq('key', key)
-        .single();
-
-      if (error) {
-        // PGRST116 is the error code for "JSON object requested, multiple (or no) rows returned"
-        // When .single() finds no rows, it throws this.
-        if (error.code === 'PGRST116') return null;
-        console.error('Supabase KV GET error:', error);
-        return null;
-      }
-
-      return data?.value ?? null;
-    } catch (err) {
-      console.error('Supabase KV GET exception:', err);
-      return null;
-    }
+export const db = {
+  // --- LOGS ---
+  async saveLog(message, level = 'info') {
+    if (!supabase) return;
+    await supabase.from('logs').insert({ message, level });
   },
 
-  async set(key, value, opts = {}) {
-    if (!supabase) return null;
-
-    try {
-      // Postgres doesn't natively support "expire" (TTL) like Redis.
-      // We ignore opts.ex for now, or we could implement a cleanup cron job later.
-
-      const { error } = await supabase
-        .from('kv_store')
-        .upsert({
-          key,
-          value,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-
-      if (error) {
-        console.error('Supabase KV SET error:', error);
-      } else {
-        // console.log('Supabase KV SET success for key:', key);
-      }
-    } catch (err) {
-      console.error('Supabase KV SET exception:', err);
-    }
-  },
-
-  async keys(pattern) {
+  async getLogs(limit = 200) {
     if (!supabase) return [];
+    const { data } = await supabase
+      .from('logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    return data || [];
+  },
 
-    try {
-      // Convert Redis-style glob pattern to SQL LIKE pattern
-      // Redis: map:anilist:* -> SQL: map:anilist:%
-      const sqlPattern = pattern.replace(/\*/g, '%');
+  // --- MAPPINGS ---
+  async saveMapping(anilistId, mapping, isManual = false) {
+    if (!supabase) return;
+    await supabase.from('mappings').upsert({
+      anilist_id: anilistId,
+      trakt_id: mapping.traktId,
+      tmdb_id: mapping.tmdbId,
+      imdb_id: mapping.imdbId,
+      tvdb_id: mapping.tvdbId,
+      type: mapping.type,
+      is_manual: isManual,
+      updated_at: new Date().toISOString()
+    });
+  },
 
-      const { data, error } = await supabase
-        .from('kv_store')
-        .select('key')
-        .like('key', sqlPattern);
+  async getMapping(anilistId) {
+    if (!supabase) return null;
+    const { data } = await supabase
+      .from('mappings')
+      .select('*')
+      .eq('anilist_id', anilistId)
+      .single();
 
-      if (error) {
-        console.error('Supabase KV KEYS error:', error);
-        return [];
-      }
+    if (!data) return null;
+    return {
+      traktId: data.trakt_id,
+      tmdbId: data.tmdb_id,
+      imdbId: data.imdb_id,
+      tvdbId: data.tvdb_id,
+      type: data.type,
+      isManual: data.is_manual
+    };
+  },
 
-      return data.map(row => row.key);
-    } catch (err) {
-      console.error('Supabase KV KEYS exception:', err);
-      return [];
+  async getAllMappings() {
+    if (!supabase) return { manual: [], auto: [] };
+    const { data } = await supabase.from('mappings').select('*');
+    if (!data) return { manual: [], auto: [] };
+
+    const manual = [];
+    const auto = [];
+
+    for (const row of data) {
+      const m = {
+        anilistId: row.anilist_id,
+        traktId: row.trakt_id,
+        tmdbId: row.tmdb_id,
+        imdbId: row.imdb_id,
+        tvdbId: row.tvdb_id
+      };
+      if (row.is_manual) manual.push(m);
+      else auto.push(m);
     }
-  }
+    return { manual, auto };
+  },
+
+  // --- CONFIG (Tokens, Status) ---
+  async setConfig(key, value) {
+    if (!supabase) return;
+    const valStr = typeof value === 'string' ? value : JSON.stringify(value);
+    await supabase.from('system_config').upsert({
+      key,
+      value: valStr,
+      updated_at: new Date().toISOString()
+    });
+  },
+
+  async getConfig(key) {
+    if (!supabase) return null;
+    const { data } = await supabase
+      .from('system_config')
+      .select('value')
+      .eq('key', key)
+      .single();
+
+    if (!data) return null;
+    // Try to parse JSON, otherwise return string
+    try {
+      return JSON.parse(data.value);
+    } catch {
+      return data.value;
+    }
+  },
+
+  // Legacy support for generic KV calls if needed (mapped to system_config)
+  async get(key) { return this.getConfig(key); },
+  async set(key, value) { return this.setConfig(key, value); }
 };
+
+// Export as 'kv' for backward compatibility, but prefer 'db'
+export const kv = db;
