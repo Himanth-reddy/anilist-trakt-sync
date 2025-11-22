@@ -49,6 +49,15 @@ export async function GET() {
 
         if (newScrobbles.length === 0) {
             await log('[Full Sync] No new scrobbles found');
+            // Update last sync timestamp to now so we don't check old history again unnecessarily
+            // Actually, we should only update if we successfully checked.
+            // But if we found 0 new scrobbles, it means we are up to date.
+            // However, getNewAnilistScrobbles uses the timestamp to query "since".
+            // If we update it to NOW, we might miss scrobbles that happen between the check and NOW.
+            // So we should probably leave it alone or update it to the time of the check?
+            // For display purposes, we want to show "Last Synced: Now".
+            // Let's store a separate key for "Last Successful Run" for display.
+            await kv.set('lastSyncTimestamp', new Date().toISOString());
             return Response.json({
                 message: 'No new scrobbles from AniList. Sync complete.',
                 synced: 0

@@ -1,17 +1,39 @@
-# AniList ↔ Trakt Sync (Complete)
+# AniList ↔ Trakt Sync
 
-Ready-to-run Next.js (App Router) project that syncs AniList -> Trakt using Fribbs mappings,
-TMDB/IMDB/TVDB fallbacks, and Upstash KV for storage.
+A robust, serverless automation tool to synchronize your anime watch progress from **AniList** to **Trakt**.
 
-## Quickstart (local)
-1. Copy `.env.example` to `.env.local` and fill in your keys.
-2. Install deps: `npm install`
-3. Run dev server: `npm run dev`
-4. Open http://localhost:3000
+## 🚀 Features
+- **Automatic Sync**: Periodically checks for new episodes on AniList and marks them as watched on Trakt.
+- **Smart ID Resolution**: Uses Fribbs, TMDB, IMDB, and TVDB to correctly map anime to Trakt shows.
+- **Manual Mapping**: Easily fix incorrect matches via a web interface.
+- **Persistent Logging**: View sync history and errors directly on the dashboard.
+- **Self-Hosted**: Runs on **Render** (Free Tier) with **Supabase** (PostgreSQL) for storage.
 
-API routes:
-- GET /api/refresh-fribbs
-- GET /api/mappings
-- POST /api/manual-map
-- GET /api/logs
-- GET /api/sync?anilistId=<id>
+## 🛠️ Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Supabase (PostgreSQL)
+- **Hosting**: Render (Web Service)
+- **Styling**: Tailwind CSS
+
+## 📦 Deployment
+
+See [DEPLOY.md](DEPLOY.md) for a step-by-step guide on how to deploy this for free.
+
+## 🔧 Environment Variables
+
+| Variable | Description |
+| :--- | :--- |
+| `ANILIST_ACCESS_TOKEN` | Your AniList API token |
+| `TRAKT_CLIENT_ID` | Trakt API Client ID |
+| `TRAKT_CLIENT_SECRET` | Trakt API Client Secret |
+| `TRAKT_ACCESS_TOKEN` | Trakt OAuth Access Token |
+| `TRAKT_REFRESH_TOKEN` | Trakt OAuth Refresh Token |
+| `SUPABASE_URL` | Supabase Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase Service Role Key |
+
+## 📝 Usage
+
+1.  **Dashboard**: View system status and "Last Synced" time.
+2.  **Sync**: Trigger a manual sync for a specific show.
+3.  **Mappings**: View and manage auto/manual ID mappings.
+4.  **Logs**: Check system activity and debug issues.stId=<id>

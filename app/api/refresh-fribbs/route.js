@@ -9,12 +9,13 @@ export async function GET(request) {
     if (searchParams.get('check')) {
       const { kv } = await import('../../../utils/kv.js');
       const lastSync = await kv.get('status:fribbs:last-sync');
+      const lastFullSync = await kv.get('lastSyncTimestamp');
       const cache = await kv.get('cache:fribbs');
       let count = 0;
       if (cache) {
         try { count = Object.keys(typeof cache === 'string' ? JSON.parse(cache) : cache).length; } catch { }
       }
-      return Response.json({ count, lastSync });
+      return Response.json({ count, lastSync, lastFullSync });
     }
 
     const data = await refreshFribbsCache();
