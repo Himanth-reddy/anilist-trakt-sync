@@ -124,7 +124,7 @@ export default function SyncPage() {
                     <p className="font-medium text-yellow-300 mb-1">⚠️ Important Setup</p>
                     <ol className="text-gray-300 list-decimal list-inside space-y-1">
                         <li>First, refresh the Fribbs database using the <strong>Dashboard</strong> page</li>
-                        <li>Ensure <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> are set in Vercel</li>
+                        <li>Ensure <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> are set in Render</li>
                         <li>The system will automatically find Trakt IDs for your shows</li>
                     </ol>
                 </div>
