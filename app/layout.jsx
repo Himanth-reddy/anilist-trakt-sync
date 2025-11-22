@@ -1,20 +1,18 @@
 import './globals.css';
+
+import { Inter } from "next/font/google";
 import React from 'react';
+import CronPinger from './components/CronPinger';
 
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
-export default function RootLayout({ children }) {
-  React.useEffect(() => {
-    // Ping cron every minute to check if sync is needed
-    const interval = setInterval(() => {
-      fetch('/api/cron').catch(console.error);
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+const inter = Inter({ subsets: ["latin"] });
 
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gray-900 text-white min-h-screen">
+      <body className={inter.className}>
+        <CronPinger />
         <nav className="bg-gray-800 p-4 flex justify-between">
           <h1 className="text-lg font-bold">AniList ↔ Trakt Sync</h1>
           <div className="space-x-4">

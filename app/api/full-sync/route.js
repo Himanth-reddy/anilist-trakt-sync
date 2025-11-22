@@ -3,6 +3,7 @@ import { getNewAnilistScrobbles } from '../../../lib/anilist.js';
 import { resolveTraktId } from '../../../lib/id-translator.js';
 import { getBreakpointMap } from '../../../lib/map-builder.js';
 import { postToTrakt } from '../../../lib/trakt.js';
+import { log } from '../../../utils/logger.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,29 +38,29 @@ function translateAnilistToTrakt(scrobble, traktShowId, breakpointMap) {
 
 export async function GET() {
     try {
-        console.log('[Full Sync] Starting AniList to Trakt sync...');
+        await log('[Full Sync] Starting AniList to Trakt sync...');
 
         // Get last sync timestamp
         const lastSyncTimestamp = await kv.get('lastSyncTimestamp') || 0;
-        console.log(`[Full Sync] Checking for new scrobbles since: ${lastSyncTimestamp}`);
+        await log(`[Full Sync] Checking for new scrobbles since: ${lastSyncTimestamp}`);
 
         // Get new scrobbles from AniList
         const newScrobbles = await getNewAnilistScrobbles(lastSyncTimestamp);
 
         if (newScrobbles.length === 0) {
-            console.log('[Full Sync] No new scrobbles found');
+            await log('[Full Sync] No new scrobbles found');
             return Response.json({
                 message: 'No new scrobbles from AniList. Sync complete.',
                 synced: 0
             });
         }
 
-        console.log(`[Full Sync] Found ${newScrobbles.length} new scrobbles`);
+        await log(`[Full Sync] Found ${newScrobbles.length} new scrobbles`);
         const translatedEpisodes = [];
 
         // Process each scrobble
         for (const scrobble of newScrobbles) {
-            console.log(`[Full Sync] Processing: ${scrobble.showTitle} - Ep ${scrobble.episodeNumber}`);
+            await log(`[Full Sync] Processing: ${scrobble.showTitle} - Ep ${scrobble.episodeNumber}`);
 
             // Resolve Trakt ID
             const traktId = await resolveTraktId(scrobble.anilistShowId);
@@ -78,7 +79,7 @@ export async function GET() {
             // Translate episode
             const traktEpisode = translateAnilistToTrakt(scrobble, traktId, breakpointMap);
             translatedEpisodes.push(traktEpisode);
-            console.log(`[Full Sync] Mapped to Trakt: Show ${traktId}, S${traktEpisode.season} E${traktEpisode.number}`);
+            await log(`[Full Sync] Mapped to Trakt: Show ${traktId}, S${traktEpisode.season} E${traktEpisode.number}`);
         }
 
         if (translatedEpisodes.length === 0) {
@@ -90,7 +91,7 @@ export async function GET() {
         }
 
         // Post to Trakt
-        console.log(`[Full Sync] Posting ${translatedEpisodes.length} episodes to Trakt...`);
+        await log(`[Full Sync] Posting ${translatedEpisodes.length} episodes to Trakt...`);
         const postResult = await postToTrakt(translatedEpisodes);
 
         // Update last sync timestamp
@@ -98,11 +99,11 @@ export async function GET() {
             const newTimestamp = newScrobbles[newScrobbles.length - 1].createdAt;
             if (newTimestamp) {
                 await kv.set('lastSyncTimestamp', newTimestamp);
-                console.log(`[Full Sync] Updated lastSyncTimestamp to ${newTimestamp}`);
+                await log(`[Full Sync] Updated lastSyncTimestamp to ${newTimestamp}`);
             }
         }
 
-        console.log('[Full Sync] Complete');
+        await log('[Full Sync] Complete');
         await kv.set('status:sync:last-run', new Date().toISOString());
         return Response.json({
             message: 'Sync complete!',
@@ -114,6 +115,7 @@ export async function GET() {
 
     } catch (err) {
         console.error('[Full Sync] ERROR:', err);
+        await log(`[Full Sync] ERROR: ${err.message}`);
         return Response.json({
             error: 'Sync process failed',
             details: err.message
