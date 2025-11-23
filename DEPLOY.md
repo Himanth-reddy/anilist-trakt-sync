@@ -36,7 +36,19 @@ This guide explains how to deploy the Anilist-Trakt Sync application using **Ren
     *   `TRAKT_REFRESH_TOKEN`: (From Trakt)
 6.  **Deploy**: Click "Create Web Service".
 
-## 3. Verification
+## 3. Cron Job Setup (Automatic Sync)
+
+To enable automatic syncing every 6 hours, you need to deploy the Cron Job defined in `render.yaml`.
+
+1.  In the Render Dashboard, go to **Blueprints**.
+2.  Click **New Blueprint Instance** and select this repository.
+3.  Render will detect both the `web` service and the `cron` service.
+4.  **Important**: For the Cron Job to work, it needs to know your Web Service's URL.
+    *   Once the Web Service is deployed, copy its URL (e.g., `https://anilist-trakt-sync.onrender.com`).
+    *   Go to the **Cron Job** settings (or Environment tab).
+    *   Add an environment variable named `APP_URL` with your Web Service URL as the value.
+
+## 4. Verification
 
 Once deployed, Render will give you a URL (e.g., `https://anilist-trakt-sync.onrender.com`).
 
