@@ -150,7 +150,7 @@ export default function SyncPage() {
             <div className="bg-blue-900/20 border border-blue-800 p-4 rounded-lg">
                 <h4 className="font-semibold text-blue-300 mb-2">ℹ️ Setup Required</h4>
                 <p className="text-sm text-gray-300">
-                    To use full sync, you need to set up API tokens in your Vercel environment variables. See the <a href="https://github.com/Himanth-reddy/anilist-trakt-sync" className="text-blue-400 hover:underline">README</a> for setup instructions.
+                    To use full sync, you need to set up API tokens in your Render environment variables. See the <a href="https://github.com/Himanth-reddy/anilist-trakt-sync" className="text-blue-400 hover:underline">README</a> for setup instructions.
                 </p>
             </div>
         </div>

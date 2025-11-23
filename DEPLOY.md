@@ -47,4 +47,4 @@ Once deployed, Render will give you a URL (e.g., `https://anilist-trakt-sync.onr
 ## Why this stack?
 
 *   **Render**: Unlike Vercel, Render's free tier allows for longer-running processes (up to minutes), which is crucial for the full sync operation.
-*   **Supabase**: Provides a persistent PostgreSQL database. Unlike Redis (Vercel KV), your data (mappings, logs) is stored permanently on disk and won't vanish unexpectedly.
+*   **Supabase**: Provides a persistent PostgreSQL database. Your data (mappings, logs) is stored permanently on disk and won't vanish unexpectedly.

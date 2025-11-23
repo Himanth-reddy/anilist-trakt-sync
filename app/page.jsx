@@ -27,7 +27,7 @@ export default function Page() {
     // but for now let's assume we can get it from a new endpoint or just check logs)
     // Actually, let's add a small endpoint to get just the status or modify refresh-fribbs to return it?
     // Better: Let's fetch it from the logs API for now as a quick hack, OR better, add it to the refresh-fribbs check?
-    // The cleanest way is to add it to the refresh-fribbs check response since that's already checking KV.
+    // The cleanest way is to add it to the refresh-fribbs check response since that's already checking DB.
   }, []);
 
   return (

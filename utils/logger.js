@@ -1,7 +1,7 @@
-import { db } from './kv.js';
+import { db } from './db.js';
 
 export async function log(msg, level = 'info') {
-    console.log(msg); // Keep console logging for Vercel runtime logs
+    console.log(msg); // Keep console logging for runtime logs
 
     try {
         await db.saveLog(msg, level);

@@ -1,4 +1,4 @@
-import { kv } from '../../../utils/kv.js';
+import { db } from '../../../utils/db.js';
 import { getNewAnilistScrobbles } from '../../../lib/anilist.js';
 import { resolveTraktId } from '../../../lib/id-translator.js';
 import { getBreakpointMap } from '../../../lib/map-builder.js';
@@ -41,7 +41,7 @@ export async function GET() {
         await log('[Full Sync] Starting AniList to Trakt sync...');
 
         // Get last sync timestamp
-        const lastSyncTimestamp = await kv.get('lastSyncTimestamp') || 0;
+        const lastSyncTimestamp = await db.getConfig('lastSyncTimestamp') || 0;
         await log(`[Full Sync] Checking for new scrobbles since: ${lastSyncTimestamp}`);
 
         // Get new scrobbles from AniList
@@ -57,7 +57,7 @@ export async function GET() {
             // So we should probably leave it alone or update it to the time of the check?
             // For display purposes, we want to show "Last Synced: Now".
             // Let's store a separate key for "Last Successful Run" for display.
-            await kv.set('lastSyncTimestamp', new Date().toISOString());
+            await db.setConfig('lastSyncTimestamp', new Date().toISOString());
             return Response.json({
                 message: 'No new scrobbles from AniList. Sync complete.',
                 synced: 0
@@ -107,13 +107,13 @@ export async function GET() {
         if (newScrobbles.length > 0) {
             const newTimestamp = newScrobbles[newScrobbles.length - 1].createdAt;
             if (newTimestamp) {
-                await kv.set('lastSyncTimestamp', newTimestamp);
+                await db.setConfig('lastSyncTimestamp', newTimestamp);
                 await log(`[Full Sync] Updated lastSyncTimestamp to ${newTimestamp}`);
             }
         }
 
         await log('[Full Sync] Complete');
-        await kv.set('status:sync:last-run', new Date().toISOString());
+        await db.setConfig('status:sync:last-run', new Date().toISOString());
         return Response.json({
             message: 'Sync complete!',
             found: newScrobbles.length,

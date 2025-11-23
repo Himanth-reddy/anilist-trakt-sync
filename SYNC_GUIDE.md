@@ -42,16 +42,16 @@ You need API tokens from both AniList and Trakt:
      }'
    ```
 
-### 3. Set Environment Variables in Vercel
+### 3. Set Environment Variables in Render
 
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **Environment Variables**
+1. Go to your Render dashboard
+2. Navigate to **Environment**
 3. Add the following variables:
    - `ANILIST_ACCESS_TOKEN` - Your AniList access token
    - `TRAKT_CLIENT_ID` - Your Trakt client ID
    - `TRAKT_ACCESS_TOKEN` - Your Trakt access token
-   - `KV_REST_API_URL` - Your Upstash KV REST URL
-   - `KV_REST_API_TOKEN` - Your Upstash KV REST token
+   - `SUPABASE_URL` - Your Supabase Project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase Service Role Key
 
 4. Redeploy your application for changes to take effect
 
@@ -75,12 +75,12 @@ You can also trigger syncs via direct API calls:
 
 **Sync Single Show:**
 ```bash
-curl "https://anilist-trakt-sync.vercel.app/api/sync?anilistId=1"
+curl "https://your-app-name.onrender.com/api/sync?anilistId=1"
 ```
 
 **Full Sync:**
 ```bash
-curl "https://anilist-trakt-sync.vercel.app/api/full-sync"
+curl "https://your-app-name.onrender.com/api/full-sync"
 ```
 
 ## How It Works
@@ -105,12 +105,12 @@ curl "https://anilist-trakt-sync.vercel.app/api/full-sync"
 
 ### "No new scrobbles found"
 - This is normal if you haven't watched anything new since the last sync
-- The app tracks the last sync timestamp in KV storage
+- The app tracks the last sync timestamp in the database
 
 ## Automation
 
 To automatically sync on a schedule, you can:
-1. Use Vercel Cron Jobs (Pro plan required)
+1. Use Render Cron Jobs (if available/configured)
 2. Use GitHub Actions to call the API endpoint
 3. Use any external scheduler (Zapier, IFTTT, etc.)
 
@@ -125,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Sync
-        run: curl "https://anilist-trakt-sync.vercel.app/api/full-sync"
+        run: curl "https://your-app-name.onrender.com/api/full-sync"
 ```
 
 ## Support

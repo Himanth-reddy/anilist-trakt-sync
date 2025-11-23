@@ -42,13 +42,13 @@ This project provides a robust solution for synchronizing anime watch progress b
 ## 📊 System Monitoring & Storage
 - **Persistent Logging**:
   - Endpoint: `/api/logs`
-  - **KV Persistence**: Stores logs in Vercel KV/Upstash to ensure they survive server restarts and serverless function cold starts.
-  - **Dual Output**: Writes to both KV (for the web UI) and Console (for Vercel runtime logs).
+  - **Persistence**: Stores logs in Supabase to ensure they survive server restarts.
+  - **Dual Output**: Writes to both Database (for the web UI) and Console (for runtime logs).
   - Retains the last 200 system events (sync actions, errors, warnings).
 
-- **KV Storage**:
-  - Utilizes a Key-Value store for high-performance data access.
-  - Caches mappings (`map:anilist:*`), normalized show data (`trakt:show:*`), tokens, and logs.
+- **Database Storage**:
+  - Utilizes Supabase (PostgreSQL) for high-performance data access.
+  - Stores mappings (`mappings` table), normalized show data, tokens, and logs.
   - **Robust Error Handling**: Gracefully handles storage failures and ensures data consistency.
 
 - **Verification System**:

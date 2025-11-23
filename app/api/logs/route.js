@@ -1,4 +1,4 @@
-import { db } from '../../../utils/kv.js';
+import { db } from '../../../utils/db.js';
 
 export const dynamic = 'force-dynamic';
 

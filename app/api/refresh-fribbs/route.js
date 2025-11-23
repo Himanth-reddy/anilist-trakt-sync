@@ -7,10 +7,10 @@ export async function GET(request) {
     console.log('[API] Refresh Fribbs called. URL:', request.url);
     const { searchParams } = new URL(request.url);
     if (searchParams.get('check')) {
-      const { kv } = await import('../../../utils/kv.js');
-      const lastSync = await kv.get('status:fribbs:last-sync');
-      const lastFullSync = await kv.get('lastSyncTimestamp');
-      const cache = await kv.get('cache:fribbs');
+      const { db } = await import('../../../utils/db.js');
+      const lastSync = await db.getConfig('status:fribbs:last-sync');
+      const lastFullSync = await db.getConfig('lastSyncTimestamp');
+      const cache = await db.getConfig('cache:fribbs');
       let count = 0;
       if (cache) {
         try { count = Object.keys(typeof cache === 'string' ? JSON.parse(cache) : cache).length; } catch { }

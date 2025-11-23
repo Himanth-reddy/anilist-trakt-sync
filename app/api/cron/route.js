@@ -1,11 +1,11 @@
 import { GET as syncAll } from '../full-sync/route.js';
-import { kv } from '../../../utils/kv.js';
+import { db } from '../../../utils/db.js';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const lastRunRaw = await kv.get('status:sync:last-run');
+        const lastRunRaw = await db.getConfig('status:sync:last-run');
         const lastRun = lastRunRaw ? new Date(lastRunRaw).getTime() : 0;
         const now = Date.now();
         const sixHours = 6 * 60 * 60 * 1000;
