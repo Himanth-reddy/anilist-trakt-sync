@@ -2,7 +2,6 @@ import './globals.css';
 
 import { Inter } from "next/font/google";
 import React from 'react';
-import CronPinger from './components/CronPinger';
 
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
@@ -12,7 +11,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CronPinger />
         <nav className="bg-gray-800 p-4 flex justify-between">
           <h1 className="text-lg font-bold">AniList ↔ Trakt Sync</h1>
           <div className="space-x-4">
