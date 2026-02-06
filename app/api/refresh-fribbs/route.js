@@ -9,7 +9,7 @@ export async function GET(request) {
     if (searchParams.get('check')) {
       const { db } = await import('../../../utils/db.js');
       const lastSync = await db.getConfig('status:fribbs:last-sync');
-      const lastFullSync = await db.getConfig('lastSyncTimestamp');
+      const lastFullSync = await db.getConfig('status:sync:last-run-auto');
       const cache = await db.getConfig('cache:fribbs');
       let count = 0;
       if (cache) {

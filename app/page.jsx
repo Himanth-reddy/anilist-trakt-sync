@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 export default function Page() {
   const [status, setStatus] = useState(null);
-  const [lastSync, setLastSync] = useState(null);
+  const [syncStatus, setSyncStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const refreshFribbs = async () => {
@@ -23,11 +23,8 @@ export default function Page() {
     // Fetch Fribbs status
     fetch('/api/refresh-fribbs?check=1', { cache: 'no-store' }).then(r => r.json()).then(setStatus).catch(() => { });
 
-    // Fetch Last Sync time (we can reuse the logs endpoint or create a specific one, 
-    // but for now let's assume we can get it from a new endpoint or just check logs)
-    // Actually, let's add a small endpoint to get just the status or modify refresh-fribbs to return it?
-    // Better: Let's fetch it from the logs API for now as a quick hack, OR better, add it to the refresh-fribbs check?
-    // The cleanest way is to add it to the refresh-fribbs check response since that's already checking DB.
+    // Fetch sync status (manual vs automated)
+    fetch('/api/status', { cache: 'no-store' }).then(r => r.json()).then(setSyncStatus).catch(() => { });
   }, []);
 
   return (
@@ -69,8 +66,9 @@ export default function Page() {
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Sync Status</h3>
           <div className="space-y-2">
-            <p>Last Full Sync: <span className="font-mono text-lg text-blue-400">{status?.lastFullSync ? new Date(status.lastFullSync).toLocaleString() : 'Checking...'}</span></p>
-            <p className="text-sm text-gray-400">Sync runs automatically every hour.</p>
+            <p>Last Automated Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastAutomatedSync ? new Date(syncStatus.lastAutomatedSync).toLocaleString() : 'Checking...'}</span></p>
+            <p>Last Manual Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastManualSync ? new Date(syncStatus.lastManualSync).toLocaleString() : 'Never'}</span></p>
+            <p className="text-sm text-gray-400">Sync runs automatically every 6 hours.</p>
           </div>
         </div>
       </div>

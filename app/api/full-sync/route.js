@@ -36,7 +36,7 @@ function translateAnilistToTrakt(scrobble, traktShowId, breakpointMap) {
     };
 }
 
-export async function GET() {
+async function runFullSync({ isAutomated = false } = {}) {
     try {
         await log('[Full Sync] Starting AniList to Trakt sync...');
 
@@ -57,7 +57,12 @@ export async function GET() {
             // So we should probably leave it alone or update it to the time of the check?
             // For display purposes, we want to show "Last Synced: Now".
             // Let's store a separate key for "Last Successful Run" for display.
-            await db.setConfig('lastSyncTimestamp', new Date().toISOString());
+            const nowIso = new Date().toISOString();
+            await db.setConfig('lastSyncTimestamp', nowIso);
+            await db.setConfig('status:sync:last-run', nowIso);
+            if (isAutomated) {
+                await db.setConfig('status:sync:last-run-auto', nowIso);
+            }
             return Response.json({
                 message: 'No new scrobbles from AniList. Sync complete.',
                 synced: 0
@@ -92,6 +97,11 @@ export async function GET() {
         }
 
         if (translatedEpisodes.length === 0) {
+            const nowIso = new Date().toISOString();
+            await db.setConfig('status:sync:last-run', nowIso);
+            if (isAutomated) {
+                await db.setConfig('status:sync:last-run-auto', nowIso);
+            }
             return Response.json({
                 message: 'No episodes could be mapped to Trakt',
                 found: newScrobbles.length,
@@ -113,7 +123,11 @@ export async function GET() {
         }
 
         await log('[Full Sync] Complete');
-        await db.setConfig('status:sync:last-run', new Date().toISOString());
+        const nowIso = new Date().toISOString();
+        await db.setConfig('status:sync:last-run', nowIso);
+        if (isAutomated) {
+            await db.setConfig('status:sync:last-run-auto', nowIso);
+        }
         return Response.json({
             message: 'Sync complete!',
             found: newScrobbles.length,
@@ -130,4 +144,12 @@ export async function GET() {
             details: err.message
         }, { status: 500 });
     }
+}
+
+export async function GET() {
+    return runFullSync({ isAutomated: false });
+}
+
+export async function runAutomatedSync() {
+    return runFullSync({ isAutomated: true });
 }
