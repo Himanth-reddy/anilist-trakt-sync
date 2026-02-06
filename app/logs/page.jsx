@@ -2,24 +2,62 @@
 import React, { useEffect, useState } from 'react';
 export default function Logs() {
   const [logs, setLogs] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  const fetchLogs = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const res = await fetch('/api/logs', { cache: 'no-store' });
+      const data = await res.json();
+      if (!res.ok) {
+        setLogs([]);
+        setError(data?.error || 'Failed to load logs.');
+        return;
+      }
+      const formatted = Array.isArray(data) ? data : [];
+      setLogs(formatted);
+      setLastUpdated(new Date());
+    } catch {
+      setLogs([]);
+      setError('Failed to load logs.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetch('/api/logs')
-      .then(r => r.json())
-      .then(data => {
-        // Handle both old string format and new object format
-        const formatted = Array.isArray(data) ? data : [];
-        setLogs(formatted);
-      })
-      .catch(() => setLogs([]));
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Logs</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold">Logs</h2>
+        <div className="flex items-center gap-3 text-sm text-gray-400">
+          {lastUpdated && (
+            <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
+          )}
+          <button
+            onClick={fetchLogs}
+            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-100"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      {error ? (
+        <div className="mb-3 text-red-400 text-sm">{error}</div>
+      ) : null}
       <div className="bg-gray-800 rounded-lg overflow-hidden">
         <div className="max-h-[600px] overflow-y-auto p-4 space-y-2 font-mono text-sm">
-          {logs.length > 0 ? (
+          {loading && logs.length === 0 ? (
+            <p className="text-gray-500 italic">Loading logs...</p>
+          ) : logs.length > 0 ? (
             logs.map((l, i) => {
               // Handle legacy string logs vs new object logs
               const isObj = typeof l === 'object' && l !== null;

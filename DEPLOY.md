@@ -38,8 +38,6 @@ This guide explains how to deploy the Anilist-Trakt Sync application using **Ren
 
 ## 3. Cron Job Setup (Automatic Sync)
 
-## 3. Cron Job Setup (Automatic Sync)
-
 Since Render's native Cron Jobs are paid, we can use **GitHub Actions** (which is free) to trigger the sync.
 
 1.  **Get your App URL**: Copy your deployed Render URL (e.g., `https://anilist-trakt-sync.onrender.com`).
