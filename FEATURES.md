@@ -1,56 +1,103 @@
-# Anilist-Trakt Sync Features
+# Feature Reference
 
-This project provides a robust solution for synchronizing anime watch progress between AniList and Trakt. Below is a point-by-point list of its features.
+This document reflects the current implemented behavior.
 
-## 🔐 Authentication & Security
-- **Trakt OAuth Integration**:
-  - Securely handles Trakt access and refresh tokens.
-  - **Auto-Refresh**: Automatically refreshes expired tokens using `lib/trakt-auth.js` without user intervention.
-  - **Retry Mechanism**: Automatically retries failed requests with a refreshed token if a 401 Unauthorized error occurs.
+## 1) Sync modes
 
-## 🔄 Synchronization
-- **Single Show Sync**: 
-  - Endpoint: `/api/sync?anilistId={id}`
-  - On-demand synchronization for individual shows.
-  - Resolves AniList ID to Trakt ID automatically.
-  - Fetches full season and episode data from Trakt.
-  - Normalizes data and stores it in KV storage for quick access.
+### 1.1 Incremental full sync (`GET /api/full-sync`)
 
-- **Full Account Sync**:
-  - Endpoint: `/api/full-sync`
-  - Triggers a synchronization process for the entire user library.
-  - **Batch Processing**: Efficiently processes multiple shows in sequence.
-  - **Progress Tracking**: Updates `lastSyncTimestamp` to ensure only new changes are processed in future runs.
+- Reads AniList list activities (`watched episode`) newer than `lastSyncTimestamp`.
+- Resolves AniList IDs to Trakt IDs.
+- Maps AniList absolute episode numbers to Trakt season/episode.
+- Applies episode-level overrides from `episode_override` when present.
+- Uses `sync_progress` to skip already synced episodes.
+- Posts grouped history payloads to Trakt.
 
-- **Automatic ID Resolution**:
-  - Uses multiple sources (Fribbs, TMDB, IMDB, TVDB) to find the correct Trakt ID for an AniList entry.
-  - **Smart Caching**: Implements a multi-layer cache (In-Memory -> KV -> External Fetch) for Fribbs data to minimize latency and API calls.
-  - **Fribbs Integration**: `/api/refresh-fribbs` endpoint to update the local ID mapping database.
+### 1.2 Completed library sync (`GET ...?preview=1`, `POST /api/completed-sync`)
 
-## 🗺️ Mapping Management
-- **View Mappings**:
-  - Endpoint: `/api/mappings`
-  - Displays all currently active mappings between AniList and Trakt.
-  - Distinguishes between automatic mappings and manual overrides.
+- Pulls AniList `COMPLETED` entries.
+- Supports preview before execution.
+- Syncs only episode range above `sync_progress.last_abs`.
+- Uses AniList completion date when available.
+- Updates `sync_progress` and completed status timestamps.
 
-- **Manual Overrides**:
-  - Endpoint: `/api/manual-map`
-  - Allows users to manually correct mismatched shows.
-  - Supports specifying Trakt, TMDB, IMDB, and TVDB IDs directly.
-  - Updates the mapping index for persistence.
+### 1.3 Watching library sync (`GET ...?preview=1`, `POST /api/watching-sync`)
 
-## 📊 System Monitoring & Storage
-- **Persistent Logging**:
-  - Endpoint: `/api/logs`
-  - **Persistence**: Stores logs in Supabase to ensure they survive server restarts.
-  - **Dual Output**: Writes to both Database (for the web UI) and Console (for runtime logs).
-  - Retains the last 200 system events (sync actions, errors, warnings).
+- Pulls AniList `CURRENT` entries.
+- Supports preview before execution.
+- Syncs only episode range above `sync_progress.last_abs`.
+- Uses current timestamp for watch date.
+- Updates `sync_progress` and watching status timestamps.
 
-- **Database Storage**:
-  - Utilizes Supabase (PostgreSQL) for high-performance data access.
-  - Stores mappings (`mappings` table), normalized show data, tokens, and logs.
-  - **Robust Error Handling**: Gracefully handles storage failures and ensures data consistency.
+### 1.4 Single show sync (`GET /api/sync?anilistId=<id>`)
 
-- **Verification System**:
-  - Includes `verify_system.js` to automate the testing of all core endpoints.
-  - Checks connectivity and response status for Fribbs, Mappings, Logs, Sync, and Manual Override endpoints.
+- Resolves show mapping.
+- Fetches Trakt seasons/episodes.
+- Stores normalized episode data in `system_config`.
+
+## 2) ID resolution and mapping
+
+### 2.1 Resolution priority
+
+1. Existing `mappings` row.
+2. Otaku cache (`cache:otaku`) including direct `trakt_id`.
+3. Fribbs cache (`cache:fribbs`) fallback.
+4. TMDB external IDs + Trakt external search (`tmdb`, `imdb`, `tvdb`).
+
+### 2.2 Cache refresh
+
+- `/api/refresh-otaku` refreshes Otaku DB-derived cache.
+- `/api/refresh-fribbs` refreshes Fribbs JSON-derived cache.
+
+### 2.3 Manual mapping
+
+- `/api/manual-map` upserts manual mappings.
+- `/api/mappings` returns manual and auto mapping groups.
+
+## 3) Progress, dedupe, and overrides
+
+- `sync_progress` tracks highest synced absolute episode per AniList show.
+- Full/completed/watching syncs all use `sync_progress` before posting.
+- `episode_override` overrides default episode mapping by `(trakt_id, abs)`.
+
+## 4) Trakt auth and token flow
+
+- `/api/trakt-auth` `GET` returns OAuth URL.
+- `/api/trakt-auth` `POST` exchanges auth code and stores tokens.
+- Runtime token strategy:
+- Reads token from `system_config` first.
+- Falls back to environment variables.
+- On 401 from Trakt, attempts token refresh and retries once.
+
+## 5) UI features
+
+### 5.1 Dashboard (`/`)
+
+- Otaku cache status + refresh.
+- Fribbs cache status + refresh.
+- Sync status timestamps (manual/automated/completed/watching).
+- Sync progress table powered by `/api/progress`.
+
+### 5.2 Sync page (`/sync`)
+
+- Single-show sync trigger.
+- Full sync trigger.
+- Completed/watching preview and execution flow.
+- Trakt auth helper.
+
+### 5.3 Logs page (`/logs`)
+
+- Polls every 5 seconds.
+- Uses cache-busting and `no-store` server headers.
+- Renders readable local timestamps with timezone.
+
+### 5.4 Mappings and manual pages
+
+- `/mappings`: shows manual and automatic mappings.
+- `/manual`: writes manual mapping rows.
+
+## 6) Scheduling
+
+- Vercel cron (from `vercel.json`) calls `/api/cron` every 6 hours.
+- `/api/cron` enforces 6-hour gating using `status:sync:last-run-auto`.
+- Non-Vercel deployments need an external scheduler calling `/api/cron`.

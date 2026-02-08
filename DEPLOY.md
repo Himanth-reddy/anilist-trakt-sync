@@ -1,64 +1,115 @@
-# Deployment Guide: Render & Supabase
+# Deployment Guide
 
-This guide explains how to deploy the Anilist-Trakt Sync application using **Render** (hosting) and **Supabase** (database).
+This guide covers production deployment with Supabase and either Vercel or Render.
 
-## 1. Supabase Setup (Database)
+## 1. Supabase setup
 
-1.  **Create a Project**: Go to [Supabase](https://supabase.com/) and create a new project.
-2.  **SQL Editor**: Go to the SQL Editor in your Supabase dashboard.
-3.  **Run Schema**: Copy the contents of `supabase_schema.sql` from this repository and run it in the SQL Editor. This creates the necessary `kv_store` table.
-4.  **Get Credentials**:
-    *   Go to **Project Settings** -> **API**.
-    *   Copy the **Project URL** (`SUPABASE_URL`).
-    *   Copy the **service_role** secret (`SUPABASE_SERVICE_ROLE_KEY`).
-    *   > ⚠️ **IMPORTANT**: Do NOT use the `anon` key. The app needs the `service_role` key to bypass Row Level Security for backend operations.
+1. Create a Supabase project.
+2. Open SQL Editor.
+3. Run `supabase_schema.sql`.
+4. Copy credentials from Project Settings -> API:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-## 2. Render Setup (Hosting)
+Important:
+- Use `service_role`, not `anon`.
+- Keep `service_role` server-side only.
 
-1.  **Create Account**: Go to [Render](https://render.com/) and sign up.
-2.  **New Web Service**: Click "New +" and select "Web Service".
-3.  **Connect GitHub**: Connect your GitHub account and select this repository.
-4.  **Configure**:
-    *   **Name**: `anilist-trakt-sync`
-    *   **Region**: Choose one close to you.
-    *   **Branch**: `main`
-    *   **Runtime**: `Node`
-    *   **Build Command**: `npm install && npm run build`
-    *   **Start Command**: `npm start`
-    *   **Plan**: Free
-5.  **Environment Variables**:
-    Add the following environment variables (copy values from your local `.env` or Supabase):
-    *   `SUPABASE_URL`: (From Supabase)
-    *   `SUPABASE_SERVICE_ROLE_KEY`: (From Supabase)
-    *   `TRAKT_CLIENT_ID`: (From Trakt)
-    *   `TRAKT_CLIENT_SECRET`: (From Trakt)
-    *   `TRAKT_ACCESS_TOKEN`: (From Trakt)
-    *   `TRAKT_REFRESH_TOKEN`: (From Trakt)
-6.  **Deploy**: Click "Create Web Service".
+## 2. Required environment variables
 
-## 3. Cron Job Setup (Automatic Sync)
+Set these in your host environment:
 
-Since Render's native Cron Jobs are paid, we can use **GitHub Actions** (which is free) to trigger the sync.
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SUPABASE_URL` | Yes | Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | DB read/write |
+| `ANILIST_ACCESS_TOKEN` | Yes | AniList GraphQL token |
+| `TRAKT_CLIENT_ID` | Yes | Trakt API key |
+| `TRAKT_CLIENT_SECRET` | Recommended | Needed for OAuth code exchange and refresh |
+| `TRAKT_ACCESS_TOKEN` | Recommended | Initial token fallback |
+| `TRAKT_REFRESH_TOKEN` | Recommended | Refresh fallback |
+| `TMDB_API_KEY` | Optional | Improves mapping resolution |
 
-1.  **Get your App URL**: Copy your deployed Render URL (e.g., `https://anilist-trakt-sync.onrender.com`).
-2.  **Go to GitHub Secrets**:
-    *   Navigate to your repository on GitHub.
-    *   Go to **Settings** -> **Secrets and variables** -> **Actions**.
-    *   Click **New repository secret**.
-3.  **Add Secret**:
-    *   **Name**: `APP_URL`
-    *   **Value**: Your Render URL (no trailing slash, e.g., `https://anilist-trakt-sync.onrender.com`).
-4.  **Done**: The workflow defined in `.github/workflows/sync.yml` will now run every 6 hours and trigger your sync endpoint.
+Optional operational variable:
 
-## 4. Verification
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SUPABASE_TOKEN` | No | Only needed for Supabase Management API/manual migration scripts |
 
-Once deployed, Render will give you a URL (e.g., `https://anilist-trakt-sync.onrender.com`).
+## 3. Option A: Vercel deployment
 
-1.  Visit `/api/mappings` to check if the database connection works (it should return an empty list initially).
-2.  Visit `/api/logs` to check the logging system.
-3.  Trigger a sync via `/api/sync?anilistId=...` or `/api/full-sync`.
+This repo already includes `vercel.json` with cron:
+- `path`: `/api/cron`
+- `schedule`: `0 */6 * * *`
 
-## Why this stack?
+Steps:
+1. Import repo into Vercel.
+2. Set all environment variables.
+3. Deploy.
 
-*   **Render**: Unlike Vercel, Render's free tier allows for longer-running processes (up to minutes), which is crucial for the full sync operation.
-*   **Supabase**: Provides a persistent PostgreSQL database. Your data (mappings, logs) is stored permanently on disk and won't vanish unexpectedly.
+Verify:
+1. Open `/` and confirm status cards load.
+2. Trigger `/api/refresh-otaku` and `/api/refresh-fribbs`.
+3. Check `/logs` for refresh log entries.
+4. Call `/api/cron` once manually and verify response.
+
+## 4. Option B: Render deployment
+
+`render.yaml` config exists for web service build/start.
+
+Steps:
+1. Create Render Web Service from this repo.
+2. Set environment variables.
+3. Deploy.
+
+Cron note:
+- Render cron is not configured in this repo.
+- Use external scheduler (GitHub Actions, UptimeRobot, cron-job.org, etc.) to call `GET https://<your-host>/api/cron` every 6 hours.
+
+## 5. Recommended post-deploy checks
+
+### 5.1 Health checks
+
+- `GET /api/status`
+- `GET /api/logs`
+- `GET /api/mappings`
+- `GET /api/progress?limit=5`
+
+### 5.2 Mapping cache checks
+
+- `GET /api/refresh-otaku?check=1`
+- `GET /api/refresh-fribbs?check=1`
+
+Expected:
+- non-zero count values after first refresh.
+
+### 5.3 Trakt auth check
+
+1. Open `/sync`.
+2. Use Trakt Auth section:
+- Click `Get Auth URL`.
+- Authorize in Trakt.
+- Paste code and save.
+3. Confirm success response and new tokens in `system_config`.
+
+## 6. Timestamp migration for old installations
+
+If your project was created before `TIMESTAMPTZ` updates, run this one-time migration:
+
+```sql
+begin;
+alter table public.logs alter column created_at type timestamptz using created_at at time zone 'UTC';
+alter table public.mappings alter column updated_at type timestamptz using updated_at at time zone 'UTC';
+alter table public.show_map alter column created_at type timestamptz using created_at at time zone 'UTC';
+alter table public.sync_progress alter column updated_at type timestamptz using updated_at at time zone 'UTC';
+alter table public.system_config alter column updated_at type timestamptz using updated_at at time zone 'UTC';
+commit;
+```
+
+## 7. Security checklist
+
+- Do not commit `.env`.
+- Rotate leaked tokens immediately.
+- Limit who can access deployment/project dashboards.
+- Keep `SUPABASE_SERVICE_ROLE_KEY` private.
+- Consider setting an auth layer in front of sync endpoints if deploying publicly.
