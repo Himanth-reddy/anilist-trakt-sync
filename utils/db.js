@@ -111,6 +111,88 @@ export const db = {
         }
     },
 
+    // --- EPISODE OVERRIDES ---
+    async getEpisodeOverrides(traktId) {
+        if (!supabase) return {};
+        try {
+            const { data, error } = await supabase
+                .from('episode_override')
+                .select('abs, season, episode')
+                .eq('trakt_id', traktId);
+
+            if (error) throw error;
+            if (!data || data.length === 0) return {};
+
+            const overrides = {};
+            for (const row of data) {
+                overrides[row.abs] = {
+                    season: row.season,
+                    episode: row.episode
+                };
+            }
+            return overrides;
+        } catch (error) {
+            console.error(`Failed to get episode overrides for Trakt ${traktId}:`, error);
+            return {};
+        }
+    },
+
+    // --- SYNC PROGRESS ---
+    async getSyncProgress(anilistId) {
+        if (!supabase) return 0;
+        try {
+            const { data, error } = await supabase
+                .from('sync_progress')
+                .select('last_abs')
+                .eq('anilist_id', anilistId)
+                .single();
+
+            if (error && error.code !== 'PGRST116') throw error;
+            if (!data) return 0;
+            return Number(data.last_abs) || 0;
+        } catch (error) {
+            console.error(`Failed to get sync progress for AniList ${anilistId}:`, error);
+            return 0;
+        }
+    },
+
+    async setSyncProgress(anilistId, lastAbs) {
+        if (!supabase) return;
+        try {
+            await supabase.from('sync_progress').upsert({
+                anilist_id: anilistId,
+                last_abs: lastAbs,
+                updated_at: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error(`Failed to set sync progress for AniList ${anilistId}:`, error);
+        }
+    },
+
+    async getSyncProgressRows(limit = 50) {
+        if (!supabase) return [];
+        try {
+            const safeLimit = Number.isFinite(Number(limit)) ? Math.max(1, Math.min(500, Number(limit))) : 50;
+            const { data, error } = await supabase
+                .from('sync_progress')
+                .select('anilist_id, last_abs, updated_at')
+                .order('updated_at', { ascending: false })
+                .limit(safeLimit);
+
+            if (error) throw error;
+            if (!data) return [];
+
+            return data.map((row) => ({
+                anilistId: row.anilist_id,
+                lastAbs: row.last_abs,
+                updatedAt: row.updated_at
+            }));
+        } catch (error) {
+            console.error('Failed to get sync progress rows:', error);
+            return [];
+        }
+    },
+
     // --- CONFIG (Tokens, Status) ---
     async setConfig(key, value) {
         if (!supabase) return;

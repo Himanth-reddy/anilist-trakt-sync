@@ -7,8 +7,20 @@ import { log } from '../../../utils/logger.js';
 
 export const dynamic = 'force-dynamic';
 
-function translateAnilistToTrakt(scrobble, traktShowId, breakpointMap) {
+function translateAnilistToTrakt(scrobble, traktShowId, breakpointMap, overrideMap = {}) {
   const anilistEpisodeNum = scrobble.episodeNumber;
+  const override = overrideMap[anilistEpisodeNum];
+
+  if (override) {
+    return {
+      traktShowId,
+      season: override.season,
+      number: override.episode,
+      watchedAt: scrobble.watchedAt,
+      title: scrobble.showTitle
+    };
+  }
+
   let traktSeason = 1;
   const reversedMap = [...breakpointMap].reverse();
 
@@ -81,8 +93,24 @@ export async function POST() {
 
     const translatedEpisodes = [];
     const previewItems = buildCompletedPreview(entries);
+    const pendingProgress = new Map();
+    const overrideCache = new Map();
+    let skippedAlreadySynced = 0;
+
+    const getOverrideMap = async (traktId) => {
+      if (overrideCache.has(traktId)) return overrideCache.get(traktId);
+      const overrides = await db.getEpisodeOverrides(traktId);
+      overrideCache.set(traktId, overrides);
+      return overrides;
+    };
 
     for (const item of previewItems) {
+      const lastSyncedAbs = await db.getSyncProgress(item.anilistShowId);
+      if (item.progress <= lastSyncedAbs) {
+        skippedAlreadySynced += 1;
+        continue;
+      }
+
       const traktId = await resolveTraktId(item.anilistShowId);
       if (!traktId) {
         console.warn(`[Library Sync] SKIP: No Trakt ID for AniList ${item.anilistShowId}`);
@@ -95,22 +123,25 @@ export async function POST() {
         continue;
       }
 
-      for (let ep = 1; ep <= item.progress; ep += 1) {
+      const overrideMap = await getOverrideMap(traktId);
+      for (let ep = lastSyncedAbs + 1; ep <= item.progress; ep += 1) {
         const scrobble = {
           anilistShowId: item.anilistShowId,
           showTitle: item.titleRomaji,
           episodeNumber: ep,
           watchedAt: item.watchedAt
         };
-        translatedEpisodes.push(translateAnilistToTrakt(scrobble, traktId, breakpointMap));
+        translatedEpisodes.push(translateAnilistToTrakt(scrobble, traktId, breakpointMap, overrideMap));
       }
+      pendingProgress.set(item.anilistShowId, item.progress);
     }
 
     if (translatedEpisodes.length === 0) {
       return Response.json({
         message: 'No episodes could be mapped to Trakt',
         found: entries.length,
-        synced: 0
+        synced: 0,
+        alreadySyncedShows: skippedAlreadySynced
       });
     }
 
@@ -125,6 +156,14 @@ export async function POST() {
       batches += 1;
     }
 
+    if (pendingProgress.size > 0) {
+      await Promise.all(
+        [...pendingProgress.entries()].map(([anilistId, lastAbs]) =>
+          db.setSyncProgress(anilistId, lastAbs)
+        )
+      );
+    }
+
     const nowIso = new Date().toISOString();
     await db.setConfig('status:sync:last-run', nowIso);
     await db.setConfig('status:sync:completed:last-run', nowIso);
@@ -133,6 +172,7 @@ export async function POST() {
       message: 'Completed library sync complete!',
       found: entries.length,
       synced: translatedEpisodes.length,
+      alreadySyncedShows: skippedAlreadySynced,
       addedEpisodes: totalAddedEpisodes,
       batches
     });

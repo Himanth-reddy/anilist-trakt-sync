@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <nav className="bg-gray-800 p-4 flex justify-between">
           <h1 className="text-lg font-bold">AniList ↔ Trakt Sync</h1>
