@@ -1,6 +1,33 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
+const DATE_TIME_FORMAT = {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true,
+  timeZoneName: 'short'
+};
+
+function parseTimestamp(value) {
+  if (!value) return null;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  const hasTimezone = /([zZ]|[+-]\d{2}:\d{2})$/.test(raw);
+  const normalized = hasTimezone ? raw : `${raw}Z`;
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function formatTimestamp(value) {
+  const parsed = parseTimestamp(value);
+  return parsed ? parsed.toLocaleString(undefined, DATE_TIME_FORMAT) : 'Never';
+}
+
 export default function Page() {
   const [status, setStatus] = useState(null);
   const [otakuStatus, setOtakuStatus] = useState(null);
@@ -88,9 +115,9 @@ export default function Page() {
             ) : (
               <div className="space-y-2">
                 <p>Entries: <span className="font-mono text-lg text-green-400">{otakuStatus.count?.toLocaleString() ?? '0'}</span></p>
-                <p className="text-sm text-gray-400">Updated: {otakuStatus.lastSync ? new Date(otakuStatus.lastSync).toLocaleString() : 'Never'}</p>
+                <p className="text-sm text-gray-400">Updated: {formatTimestamp(otakuStatus.lastSync)}</p>
                 {otakuStatus.lastActivity ? (
-                  <p className="text-sm text-gray-400">Source Updated: {new Date(otakuStatus.lastActivity).toLocaleString()}</p>
+                  <p className="text-sm text-gray-400">Source Updated: {formatTimestamp(otakuStatus.lastActivity)}</p>
                 ) : null}
               </div>
             )
@@ -121,7 +148,7 @@ export default function Page() {
             ) : (
               <div className="space-y-2">
                 <p>Entries: <span className="font-mono text-lg text-green-400">{status.count?.toLocaleString() ?? '0'}</span></p>
-                <p className="text-sm text-gray-400">Updated: {status.lastSync ? new Date(status.lastSync).toLocaleString() : 'Never'}</p>
+                <p className="text-sm text-gray-400">Updated: {formatTimestamp(status.lastSync)}</p>
               </div>
             )
           ) : (
@@ -133,8 +160,8 @@ export default function Page() {
         <div className="bg-gray-800 p-6 rounded-lg">
           <h3 className="text-xl font-semibold mb-4">Sync Status</h3>
           <div className="space-y-2">
-            <p>Last Automated Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastAutomatedSync ? new Date(syncStatus.lastAutomatedSync).toLocaleString() : 'Checking...'}</span></p>
-            <p>Last Manual Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastManualSync ? new Date(syncStatus.lastManualSync).toLocaleString() : 'Never'}</span></p>
+            <p>Last Automated Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastAutomatedSync ? formatTimestamp(syncStatus.lastAutomatedSync) : 'Checking...'}</span></p>
+            <p>Last Manual Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastManualSync ? formatTimestamp(syncStatus.lastManualSync) : 'Never'}</span></p>
             <p className="text-sm text-gray-400">Sync runs automatically every 6 hours.</p>
           </div>
         </div>
@@ -180,7 +207,7 @@ export default function Page() {
                           <tr key={row.anilistId} className="border-t border-gray-700">
                             <td className="p-2 font-mono">{row.anilistId}</td>
                             <td className="p-2 font-mono">{row.lastAbs}</td>
-                            <td className="p-2 text-gray-300">{row.updatedAt ? new Date(row.updatedAt).toLocaleString() : '-'}</td>
+                            <td className="p-2 text-gray-300">{row.updatedAt ? formatTimestamp(row.updatedAt) : '-'}</td>
                           </tr>
                         ))
                       )}

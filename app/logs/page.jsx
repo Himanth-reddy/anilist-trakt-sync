@@ -1,5 +1,33 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+
+const DATE_TIME_FORMAT = {
+  year: 'numeric',
+  month: 'short',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true,
+  timeZoneName: 'short'
+};
+
+function parseTimestamp(value) {
+  if (!value) return null;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  const hasTimezone = /([zZ]|[+-]\d{2}:\d{2})$/.test(raw);
+  const normalized = hasTimezone ? raw : `${raw}Z`;
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed;
+}
+
+function formatTimestamp(value) {
+  const parsed = parseTimestamp(value);
+  return parsed ? parsed.toLocaleString(undefined, DATE_TIME_FORMAT) : 'Unknown';
+}
+
 export default function Logs() {
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState('');
@@ -10,7 +38,7 @@ export default function Logs() {
     try {
       setLoading(true);
       setError('');
-      const res = await fetch('/api/logs', { cache: 'no-store' });
+      const res = await fetch(`/api/logs?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) {
         setLogs([]);
@@ -65,16 +93,17 @@ export default function Logs() {
               const ts = isObj ? l.created_at : null;
               const level = isObj ? l.level : 'info';
 
-              // Format timestamp to local time
-              const timeStr = ts
-                ? new Date(ts).toLocaleString()
-                : (typeof l === 'string' && l.match(/^\[(.*?)\]/) ? new Date(l.match(/^\[(.*?)\]/)[1]).toLocaleString() : 'Unknown');
+              const legacyTs = typeof l === 'string' && l.match(/^\[(.*?)\]/)
+                ? l.match(/^\[(.*?)\]/)[1]
+                : null;
+              const timeStr = formatTimestamp(ts || legacyTs);
 
               // Color coding based on level
               const colorClass = level === 'error' ? 'text-red-400' : (level === 'warn' ? 'text-yellow-400' : 'text-gray-300');
+              const key = isObj ? (l.id ?? `${ts}-${msg}`) : `${i}-${msg}`;
 
               return (
-                <div key={i} className="border-b border-gray-700 pb-1 last:border-0">
+                <div key={key} className="border-b border-gray-700 pb-1 last:border-0">
                   <span className="text-gray-500 mr-2">[{timeStr}]</span>
                   <span className={colorClass}>{msg.replace(/^\[.*?\]\s*/, '')}</span>
                 </div>

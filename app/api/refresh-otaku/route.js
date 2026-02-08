@@ -1,4 +1,5 @@
 import { refreshOtakuCache } from '../../../lib/otaku.js';
+import { log } from '../../../utils/logger.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,10 @@ export async function GET(request) {
     }
 
     const data = await refreshOtakuCache();
+    await log(`[Otaku] Cache refreshed (${Object.keys(data).length} entries)`);
     return Response.json({ success: true, count: Object.keys(data).length, lastSync: new Date().toISOString() });
   } catch (err) {
+    await log(`[Otaku] Refresh failed: ${err.message}`, 'error');
     return Response.json({ error: err.message }, { status: 500 });
   }
 }

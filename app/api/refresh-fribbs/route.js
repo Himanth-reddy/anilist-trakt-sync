@@ -1,4 +1,5 @@
 import { refreshFribbsCache } from '../../../lib/fribbs.js';
+import { log } from '../../../utils/logger.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,10 @@ export async function GET(request) {
     }
 
     const data = await refreshFribbsCache();
+    await log(`[Fribbs] Cache refreshed (${Object.keys(data).length} entries)`);
     return Response.json({ success: true, count: Object.keys(data).length, lastSync: new Date().toISOString() });
   } catch (err) {
+    await log(`[Fribbs] Refresh failed: ${err.message}`, 'error');
     return Response.json({ error: err.message }, { status: 500 });
   }
 }
