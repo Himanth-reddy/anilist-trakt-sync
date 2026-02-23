@@ -39,7 +39,7 @@ export async function POST(request) {
 
   const response = await fetch('https://api.trakt.tv/oauth/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'User-Agent': 'Anilist-Trakt-Sync/1.0' },
     body: JSON.stringify({
       code,
       client_id: TRAKT_CLIENT_ID,
