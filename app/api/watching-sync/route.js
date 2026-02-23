@@ -114,6 +114,9 @@ export async function POST() {
     for (let i = 0; i < translatedEpisodes.length; i += batchSize) {
       const batch = translatedEpisodes.slice(i, i + batchSize);
       const result = await postToTrakt(batch);
+      if (result.error) {
+        throw new Error(`Trakt sync failed: ${result.error}`);
+      }
       totalAddedEpisodes += result?.added?.episodes || 0;
       batches += 1;
     }
