@@ -1,0 +1,14 @@
+
+> anilist-trakt-sync@ dev /app
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 677ms
+ GET /sync 200 in 3.3s (compile: 3.0s, render: 300ms)
+ GET /api/status 200 in 669ms (compile: 651ms, render: 18ms)
+ GET /sync 200 in 223ms (compile: 64ms, render: 159ms)
+ GET /api/status 200 in 9ms (compile: 4ms, render: 6ms)

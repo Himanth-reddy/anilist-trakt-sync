@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { extractAnilistId } from '../../lib/url-utils';
 
 export default function SyncPage() {
     const [manualId, setManualId] = useState('');
@@ -29,6 +30,12 @@ export default function SyncPage() {
             .then(setSyncStatus)
             .catch(() => { });
     }, []);
+
+    const handleManualIdChange = (e) => {
+        const val = e.target.value;
+        const extracted = extractAnilistId(val);
+        setManualId(extracted || val);
+    };
 
     const syncShow = async () => {
         if (!manualId.trim()) {
@@ -226,25 +233,34 @@ export default function SyncPage() {
                     Sync a specific show by entering its AniList ID. This will fetch the show metadata and store episode mappings.
                 </p>
 
-                <div className="flex gap-3 mb-2">
-                    <input
-                        type="text"
-                        value={manualId}
-                        onChange={(e) => setManualId(e.target.value)}
-                        placeholder="Enter AniList ID (e.g., 1 for Cowboy Bebop)"
-                        className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                        onKeyPress={(e) => e.key === 'Enter' && syncShow()}
-                    />
-                    <button
-                        onClick={syncShow}
-                        disabled={manualLoading}
-                        className={`px-6 py-2 rounded font-medium transition-colors ${manualLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
-                    >
-                        {manualLoading ? 'Syncing...' : 'Sync Show'}
-                    </button>
+                <div className="mb-2">
+                    <label htmlFor="manualId" className="block text-sm font-medium mb-1 text-gray-300">
+                        AniList ID or URL
+                    </label>
+                    <div className="flex gap-3">
+                        <input
+                            id="manualId"
+                            type="text"
+                            value={manualId}
+                            onChange={handleManualIdChange}
+                            placeholder="Enter ID (e.g., 1) or full AniList URL"
+                            className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                            onKeyPress={(e) => e.key === 'Enter' && syncShow()}
+                        />
+                        <button
+                            onClick={syncShow}
+                            disabled={manualLoading}
+                            className={`px-6 py-2 rounded font-medium transition-colors ${manualLoading
+                                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
+                        >
+                            {manualLoading ? 'Syncing...' : 'Sync Show'}
+                        </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                        Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
+                    </p>
                 </div>
 
                 <ResultDisplay result={manualResult} />
