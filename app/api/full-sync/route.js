@@ -4,48 +4,9 @@ import { resolveTraktId } from '../../../lib/id-translator.js';
 import { getBreakpointMap } from '../../../lib/map-builder.js';
 import { postToTrakt } from '../../../lib/trakt.js';
 import { log } from '../../../utils/logger.js';
+import { translateAnilistToTrakt } from '../../../lib/translator.js';
 
 export const dynamic = 'force-dynamic';
-
-/**
- * Translates an Anilist scrobble into a Trakt-ready scrobble object.
- */
-function translateAnilistToTrakt(scrobble, traktShowId, breakpointMap, overrideMap = {}) {
-    const anilistEpisodeNum = scrobble.episodeNumber;
-    const override = overrideMap[anilistEpisodeNum];
-
-    if (override) {
-        return {
-            traktShowId,
-            season: override.season,
-            number: override.episode,
-            watchedAt: scrobble.watchedAt,
-            title: scrobble.showTitle
-        };
-    }
-
-    // Find the correct season based on breakpoint map
-    let traktSeason = 1;
-    const reversedMap = [...breakpointMap].reverse();
-
-    for (const entry of reversedMap) {
-        if (anilistEpisodeNum >= entry.starts_at) {
-            traktSeason = entry.season;
-            break;
-        }
-    }
-
-    // For most anime, absolute episode number = Trakt episode number
-    const traktEpisodeNum = anilistEpisodeNum;
-
-    return {
-        traktShowId,
-        season: traktSeason,
-        number: traktEpisodeNum,
-        watchedAt: scrobble.watchedAt,
-        title: scrobble.showTitle
-    };
-}
 
 async function runFullSync({ isAutomated = false } = {}) {
     try {
