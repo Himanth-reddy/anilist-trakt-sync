@@ -246,6 +246,7 @@ export default function SyncPage() {
                             placeholder="Enter ID (e.g., 1) or full AniList URL"
                             className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                             onKeyPress={(e) => e.key === 'Enter' && syncShow()}
+                            aria-describedby="manualId-hint"
                         />
                         <button
                             onClick={syncShow}
@@ -258,7 +259,7 @@ export default function SyncPage() {
                             {manualLoading ? 'Syncing...' : 'Sync Show'}
                         </button>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p id="manualId-hint" className="text-xs text-gray-400 mt-1">
                         Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
                     </p>
                 </div>
