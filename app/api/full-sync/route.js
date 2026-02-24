@@ -30,33 +30,14 @@ async function runFullSync({ isAutomated = false } = {}) {
         const progressCache = new Map();
         const overrideCache = new Map();
         const pendingProgress = new Map();
+        const mappingCache = new Map();
+        const breakpointMapCache = new Map();
+
         let skippedAlreadySynced = 0;
         let skippedUnmapped = 0;
 
-        const getLastSyncedAbs = async (anilistId) => {
-            if (progressCache.has(anilistId)) return progressCache.get(anilistId);
-            const lastAbs = await db.getSyncProgress(anilistId);
-            progressCache.set(anilistId, lastAbs);
-            return lastAbs;
-        };
-
-        const getOverrideMap = async (traktId) => {
-            if (overrideCache.has(traktId)) return overrideCache.get(traktId);
-            const overrides = await db.getEpisodeOverrides(traktId);
-            overrideCache.set(traktId, overrides);
-            return overrides;
-        };
-
         if (newScrobbles.length === 0) {
             await log('[Full Sync] No new scrobbles found');
-            // Update last sync timestamp to now so we don't check old history again unnecessarily
-            // Actually, we should only update if we successfully checked.
-            // But if we found 0 new scrobbles, it means we are up to date.
-            // However, getNewAnilistScrobbles uses the timestamp to query "since".
-            // If we update it to NOW, we might miss scrobbles that happen between the check and NOW.
-            // So we should probably leave it alone or update it to the time of the check?
-            // For display purposes, we want to show "Last Synced: Now".
-            // Let's store a separate key for "Last Successful Run" for display.
             const nowIso = await markSyncRun();
             await db.setConfig('lastSyncTimestamp', nowIso);
             return Response.json({
@@ -68,26 +49,113 @@ async function runFullSync({ isAutomated = false } = {}) {
         await log(`[Full Sync] Found ${newScrobbles.length} new scrobbles`);
         const translatedEpisodes = [];
 
+        // --- STEP 1: Batch fetch sync progress and mappings ---
+        const uniqueAnilistIds = [...new Set(newScrobbles.map(s => s.anilistShowId))];
+        await log(`[Full Sync] Batch fetching data for ${uniqueAnilistIds.length} shows...`);
+
+        const [batchProgress, batchMappings] = await Promise.all([
+            db.getBatchSyncProgress(uniqueAnilistIds),
+            db.getBatchMappings(uniqueAnilistIds)
+        ]);
+
+        // Populate caches
+        for (const [id, val] of Object.entries(batchProgress)) {
+            progressCache.set(Number(id), val);
+        }
+        for (const [id, val] of Object.entries(batchMappings)) {
+            mappingCache.set(Number(id), val);
+        }
+
+        // --- STEP 2: Resolve Trakt IDs (use cache, fallback to resolveTraktId) ---
+        const resolvedTraktIds = new Set();
+        const anilistToTraktMap = new Map(); // Local map for this run
+
+        // We can process this sequentially or in parallel.
+        // Since we have batchMappings, many will be hits. Misses will be slow.
+        // Let's do a simple loop, as misses are expected to be rare after initial runs.
+        for (const anilistId of uniqueAnilistIds) {
+            let traktId = null;
+            if (mappingCache.has(anilistId)) {
+                traktId = mappingCache.get(anilistId).traktId;
+            } else {
+                // Fallback to individual resolution (API calls)
+                traktId = await resolveTraktId(anilistId);
+            }
+
+            if (traktId) {
+                anilistToTraktMap.set(anilistId, traktId);
+                resolvedTraktIds.add(traktId);
+            }
+        }
+
+        // --- STEP 3: Batch fetch configs (maps) and overrides ---
+        const uniqueTraktIds = [...resolvedTraktIds];
+        if (uniqueTraktIds.length > 0) {
+            await log(`[Full Sync] Batch fetching secondary data for ${uniqueTraktIds.length} Trakt IDs...`);
+            const mapKeys = uniqueTraktIds.map(id => `map:${id}`);
+
+            const [batchConfigs, batchOverrides] = await Promise.all([
+                db.getBatchConfigs(mapKeys),
+                db.getBatchEpisodeOverrides(uniqueTraktIds)
+            ]);
+
+            // Populate breakpoint cache (from configs)
+            for (const [key, val] of Object.entries(batchConfigs)) {
+                // key is "map:12345"
+                const traktId = key.split(':')[1];
+                if (traktId) {
+                    breakpointMapCache.set(Number(traktId), val);
+                    // Also handle string keys if they come back as strings
+                    breakpointMapCache.set(traktId, val);
+                }
+            }
+
+            // Populate override cache
+            for (const [id, val] of Object.entries(batchOverrides)) {
+                overrideCache.set(Number(id), val);
+                overrideCache.set(String(id), val);
+            }
+        }
+
+        const getLastSyncedAbs = (anilistId) => {
+            // If it was in the batch, it's in the cache. If not, it's 0.
+            return progressCache.get(anilistId) || 0;
+        };
+
+        const getOverrideMap = (traktId) => {
+            return overrideCache.get(traktId) || {};
+        };
+
+        // --- STEP 4: Process Scrobbles ---
         // Process each scrobble
         for (const scrobble of newScrobbles) {
             await log(`[Full Sync] Processing: ${scrobble.showTitle} - Ep ${scrobble.episodeNumber}`);
-            const storedLastAbs = await getLastSyncedAbs(scrobble.anilistShowId);
+            const storedLastAbs = getLastSyncedAbs(scrobble.anilistShowId);
             const runLastAbs = Math.max(storedLastAbs, pendingProgress.get(scrobble.anilistShowId) || 0);
             if (scrobble.episodeNumber <= runLastAbs) {
                 skippedAlreadySynced += 1;
                 continue;
             }
 
-            // Resolve Trakt ID
-            const traktId = await resolveTraktId(scrobble.anilistShowId);
+            // Get Trakt ID from our pre-resolved map
+            const traktId = anilistToTraktMap.get(scrobble.anilistShowId);
             if (!traktId) {
                 console.warn(`[Full Sync] SKIP: No Trakt ID for AniList ${scrobble.anilistShowId}`);
                 skippedUnmapped += 1;
                 continue;
             }
 
-            // Get breakpoint map for proper season/episode mapping
-            const breakpointMap = await getBreakpointMap(traktId);
+            // Get breakpoint map (check cache, fallback to fetch)
+            let breakpointMap = breakpointMapCache.get(traktId) || breakpointMapCache.get(String(traktId));
+            if (!breakpointMap) {
+                // Fallback: If not in batch config, fetch it (this will save to DB too)
+                breakpointMap = await getBreakpointMap(traktId);
+                // Update cache for subsequent items of same show in this loop
+                if (breakpointMap) {
+                    breakpointMapCache.set(traktId, breakpointMap);
+                }
+            }
+
             if (!breakpointMap) {
                 console.warn(`[Full Sync] SKIP: No map for Trakt ID ${traktId}`);
                 skippedUnmapped += 1;
@@ -95,7 +163,7 @@ async function runFullSync({ isAutomated = false } = {}) {
             }
 
             // Translate episode
-            const overrideMap = await getOverrideMap(traktId);
+            const overrideMap = getOverrideMap(traktId);
             const traktEpisode = translateAnilistToTrakt(scrobble, traktId, breakpointMap, overrideMap);
             translatedEpisodes.push(traktEpisode);
             pendingProgress.set(scrobble.anilistShowId, Math.max(runLastAbs, scrobble.episodeNumber));
