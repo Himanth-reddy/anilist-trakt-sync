@@ -52,37 +52,67 @@ export default function MappingsPage() {
                 </td>
               </tr>
             ) : (
-              mappings.map((m, i) => (
-                <tr key={i} className="border-t border-gray-700 hover:bg-gray-750">
+              mappings.map((m) => (
+                <tr key={`${m.anilistId}-${m.traktId}-${m.tmdbId}-${m.imdbId}-${m.tvdbId}`} className="border-t border-gray-700 hover:bg-gray-750">
                   <td className="p-3 font-mono">
-                    <a href={`https://anilist.co/anime/${m.anilistId}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                    <a
+                      href={`https://anilist.co/anime/${m.anilistId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:underline"
+                      aria-label={`Open AniList entry ${m.anilistId}`}
+                    >
                       {m.anilistId}
                     </a>
                   </td>
                   <td className="p-3 font-mono">
                     {m.traktId ? (
-                      <a href={`https://trakt.tv/shows/${m.traktId}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                      <a
+                        href={`https://trakt.tv/shows/${m.traktId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open Trakt show ${m.traktId}`}
+                      >
                         {m.traktId}
                       </a>
                     ) : '-'}
                   </td>
                   <td className="p-3 font-mono">
                     {m.tmdbId ? (
-                      <a href={`https://www.themoviedb.org/tv/${m.tmdbId}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                      <a
+                        href={`https://www.themoviedb.org/tv/${m.tmdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open TMDB TV entry ${m.tmdbId}`}
+                      >
                         {m.tmdbId}
                       </a>
                     ) : '-'}
                   </td>
                   <td className="p-3 font-mono">
                     {m.imdbId ? (
-                      <a href={`https://www.imdb.com/title/${m.imdbId}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                      <a
+                        href={`https://www.imdb.com/title/${m.imdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open IMDB title ${m.imdbId}`}
+                      >
                         {m.imdbId}
                       </a>
                     ) : '-'}
                   </td>
                   <td className="p-3 font-mono">
                     {m.tvdbId ? (
-                      <a href={`https://thetvdb.com/dereferrer/series/${m.tvdbId}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                      <a
+                        href={`https://thetvdb.com/dereferrer/series/${m.tvdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open TVDB series ${m.tvdbId}`}
+                      >
                         {m.tvdbId}
                       </a>
                     ) : '-'}
