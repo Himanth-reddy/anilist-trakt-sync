@@ -255,11 +255,13 @@ export default function SyncPage() {
                         <button
                             onClick={syncShow}
                             disabled={manualLoading}
-                            className={`px-6 py-2 rounded font-medium transition-colors ${manualLoading
+                            aria-busy={manualLoading}
+                            className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${manualLoading
                                 ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                                 }`}
                         >
+                            {manualLoading && <Spinner />}
                             {manualLoading ? 'Syncing...' : 'Sync Show'}
                         </button>
                     </div>
