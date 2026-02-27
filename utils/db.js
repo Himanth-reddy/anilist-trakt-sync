@@ -111,6 +111,34 @@ export const db = {
         }
     },
 
+    async getBatchMappings(anilistIds) {
+        if (!supabase || !anilistIds.length) return {};
+        try {
+            const { data, error } = await supabase
+                .from('mappings')
+                .select('anilist_id, trakt_id, tmdb_id, imdb_id, tvdb_id, type')
+                .in('anilist_id', anilistIds);
+
+            if (error) throw error;
+            if (!data) return {};
+
+            const result = {};
+            for (const row of data) {
+                result[row.anilist_id] = {
+                    traktId: row.trakt_id,
+                    tmdbId: row.tmdb_id,
+                    imdbId: row.imdb_id,
+                    tvdbId: row.tvdb_id,
+                    type: row.type
+                };
+            }
+            return result;
+        } catch (error) {
+            console.error('Failed to get batch mappings:', error);
+            return {};
+        }
+    },
+
     // --- EPISODE OVERRIDES ---
     async getEpisodeOverrides(traktId) {
         if (!supabase) return {};
@@ -137,6 +165,32 @@ export const db = {
         }
     },
 
+    async getBatchEpisodeOverrides(traktIds) {
+        if (!supabase || !traktIds.length) return {};
+        try {
+            const { data, error } = await supabase
+                .from('episode_override')
+                .select('trakt_id, abs, season, episode')
+                .in('trakt_id', traktIds);
+
+            if (error) throw error;
+            if (!data) return {};
+
+            const result = {};
+            for (const row of data) {
+                if (!result[row.trakt_id]) result[row.trakt_id] = {};
+                result[row.trakt_id][row.abs] = {
+                    season: row.season,
+                    episode: row.episode
+                };
+            }
+            return result;
+        } catch (error) {
+            console.error('Failed to get batch episode overrides:', error);
+            return {};
+        }
+    },
+
     // --- SYNC PROGRESS ---
     async getSyncProgress(anilistId) {
         if (!supabase) return 0;
@@ -153,6 +207,28 @@ export const db = {
         } catch (error) {
             console.error(`Failed to get sync progress for AniList ${anilistId}:`, error);
             return 0;
+        }
+    },
+
+    async getBatchSyncProgress(anilistIds) {
+        if (!supabase || !anilistIds.length) return {};
+        try {
+            const { data, error } = await supabase
+                .from('sync_progress')
+                .select('anilist_id, last_abs')
+                .in('anilist_id', anilistIds);
+
+            if (error) throw error;
+            if (!data) return {};
+
+            const result = {};
+            for (const row of data) {
+                result[row.anilist_id] = Number(row.last_abs) || 0;
+            }
+            return result;
+        } catch (error) {
+            console.error('Failed to get batch sync progress:', error);
+            return {};
         }
     },
 
@@ -229,6 +305,32 @@ export const db = {
         } catch (error) {
             console.error(`Failed to get config ${key}:`, error);
             return null;
+        }
+    },
+
+    async getBatchConfigs(keys) {
+        if (!supabase || !keys.length) return {};
+        try {
+            const { data, error } = await supabase
+                .from('system_config')
+                .select('key, value')
+                .in('key', keys);
+
+            if (error) throw error;
+            if (!data) return {};
+
+            const result = {};
+            for (const row of data) {
+                try {
+                    result[row.key] = JSON.parse(row.value);
+                } catch {
+                    result[row.key] = row.value;
+                }
+            }
+            return result;
+        } catch (error) {
+            console.error('Failed to get batch configs:', error);
+            return {};
         }
     }
 };
