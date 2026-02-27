@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
+import Spinner from '../components/Spinner';
 
 export default function SyncPage() {
     const [manualId, setManualId] = useState('');
@@ -19,6 +20,7 @@ export default function SyncPage() {
     const [modalMode, setModalMode] = useState(null);
     const [modalItems, setModalItems] = useState([]);
     const [previewLoading, setPreviewLoading] = useState(false);
+    const [previewMode, setPreviewMode] = useState(null);
     const [authUrl, setAuthUrl] = useState('');
     const [authCode, setAuthCode] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
@@ -86,6 +88,7 @@ export default function SyncPage() {
     const openPreview = async (mode) => {
         const endpoint = mode === 'completed' ? '/api/completed-sync?preview=1' : '/api/watching-sync?preview=1';
         setPreviewLoading(true);
+        setPreviewMode(mode);
         try {
             const res = await fetch(endpoint);
             const data = await res.json();
@@ -103,6 +106,7 @@ export default function SyncPage() {
             else setWatchingResult({ error: e.message });
         } finally {
             setPreviewLoading(false);
+            setPreviewMode(null);
         }
     };
 
@@ -262,6 +266,28 @@ export default function SyncPage() {
                     <p id="manualId-hint" className="text-xs text-gray-400 mt-1">
                         Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
                     </p>
+                <div className="flex gap-3 mb-2">
+                    <input
+                        type="text"
+                        value={manualId}
+                        onChange={(e) => setManualId(e.target.value)}
+                        placeholder="Enter AniList ID (e.g., 1 for Cowboy Bebop)"
+                        aria-label="AniList ID"
+                        className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                        onKeyDown={(e) => e.key === 'Enter' && syncShow()}
+                    />
+                    <button
+                        onClick={syncShow}
+                        disabled={manualLoading}
+                        aria-busy={manualLoading}
+                        className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${manualLoading
+                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            }`}
+                    >
+                        {manualLoading && <Spinner />}
+                        {manualLoading ? 'Syncing...' : 'Sync Show'}
+                    </button>
                 </div>
 
                 <ResultDisplay result={manualResult} />
@@ -282,11 +308,13 @@ export default function SyncPage() {
                 <button
                     onClick={syncAll}
                     disabled={fullLoading}
-                    className={`px-6 py-2 rounded font-medium transition-colors ${fullLoading
+                    aria-busy={fullLoading}
+                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${fullLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
                 >
+                    {fullLoading && <Spinner />}
                     {fullLoading ? 'Syncing...' : 'Sync All Watched'}
                 </button>
 
@@ -306,16 +334,18 @@ export default function SyncPage() {
                 <button
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
-                    className={`px-6 py-2 rounded font-medium transition-colors ${completedLoading
+                    aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
+                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${completedLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                         }`}
                 >
+                    {(completedLoading || (previewLoading && previewMode === 'completed')) && <Spinner />}
                     {completedLoading ? 'Syncing...' : 'Sync Completed'}
                 </button>
 
                 <ResultDisplay result={completedResult} />
-                {previewLoading && (
+                {previewLoading && previewMode === 'completed' && (
                     <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
                 )}
                 {completedLoading && (
@@ -336,16 +366,18 @@ export default function SyncPage() {
                 <button
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
-                    className={`px-6 py-2 rounded font-medium transition-colors ${watchingLoading
+                    aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
+                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${watchingLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                         }`}
                 >
+                    {(watchingLoading || (previewLoading && previewMode === 'watching')) && <Spinner />}
                     {watchingLoading ? 'Syncing...' : 'Sync Watching'}
                 </button>
 
                 <ResultDisplay result={watchingResult} />
-                {previewLoading && (
+                {previewLoading && previewMode === 'watching' && (
                     <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
                 )}
                 {watchingLoading && (
@@ -419,11 +451,13 @@ export default function SyncPage() {
                     <button
                         onClick={getTraktAuthUrl}
                         disabled={authLoading}
-                        className={`px-4 py-2 rounded font-medium transition-colors ${authLoading
+                        aria-busy={authLoading}
+                        className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${authLoading
                             ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                             : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
                     >
+                        {authLoading && <Spinner />}
                         {authLoading ? 'Loading...' : 'Get Auth URL'}
                     </button>
                     {authUrl && (
@@ -444,16 +478,19 @@ export default function SyncPage() {
                         value={authCode}
                         onChange={(e) => setAuthCode(e.target.value)}
                         placeholder="Paste Trakt auth code here"
+                        aria-label="Trakt Auth Code"
                         className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                     />
                     <button
                         onClick={exchangeTraktCode}
                         disabled={authLoading}
-                        className={`px-4 py-2 rounded font-medium transition-colors ${authLoading
+                        aria-busy={authLoading}
+                        className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${authLoading
                             ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                             : 'bg-green-600 hover:bg-green-700 text-white'
                             }`}
                     >
+                        {authLoading && <Spinner />}
                         {authLoading ? 'Saving...' : 'Save Code'}
                     </button>
                 </div>

@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Spinner from './components/Spinner';
 
 const DATE_TIME_FORMAT = {
   year: 'numeric',
@@ -100,11 +101,14 @@ export default function Page() {
             <button
               onClick={refreshOtaku}
               disabled={otakuLoading}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${otakuLoading
+              aria-label={otakuLoading ? "Refreshing Otaku Mappings Database" : "Update Otaku Mappings Database"}
+              aria-busy={otakuLoading}
+              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${otakuLoading
                 ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
             >
+              {otakuLoading && <Spinner />}
               {otakuLoading ? 'Refreshing...' : 'Update'}
             </button>
           </div>
@@ -133,11 +137,14 @@ export default function Page() {
             <button
               onClick={refreshFribbs}
               disabled={loading}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${loading
+              aria-label={loading ? "Refreshing Fribbs Database" : "Update Fribbs Database"}
+              aria-busy={loading}
+              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${loading
                 ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
             >
+              {loading && <Spinner />}
               {loading ? 'Refreshing...' : 'Update'}
             </button>
           </div>
@@ -173,11 +180,14 @@ export default function Page() {
             <button
               onClick={refreshProgress}
               disabled={progressLoading}
-              className={`px-3 py-1 text-sm rounded font-medium transition-colors ${progressLoading
+              aria-label={progressLoading ? "Refreshing Sync Progress" : "Update Sync Progress"}
+              aria-busy={progressLoading}
+              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${progressLoading
                 ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
             >
+              {progressLoading && <Spinner />}
               {progressLoading ? 'Refreshing...' : 'Update'}
             </button>
           </div>

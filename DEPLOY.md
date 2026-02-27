@@ -55,12 +55,21 @@ Verify:
 
 ## 4. Option B: Render deployment
 
-`render.yaml` config exists for web service build/start.
+Create a new Web Service manually.
+
+Settings:
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
+- Environment Variables:
+  - `NODE_VERSION`: `20.0.0`
+  - Plus all required variables listed in Section 2.
 
 Steps:
-1. Create Render Web Service from this repo.
-2. Set environment variables.
-3. Deploy.
+1. Create New -> Web Service.
+2. Connect this repository.
+3. Use the settings above.
+4. Add environment variables.
+5. Deploy.
 
 Cron note:
 - Render cron is not configured in this repo.
