@@ -1,6 +1,13 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 
+const Spinner = () => (
+  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
+
 export default function MappingsPage() {
   const [data, setData] = useState({ manual: [], auto: [] });
   const [loading, setLoading] = useState(false);
@@ -30,11 +37,11 @@ export default function MappingsPage() {
         <table className="w-full bg-gray-800 rounded-lg">
           <thead>
             <tr className="text-left text-gray-400 border-b border-gray-700">
-              <th className="p-3">AniList ID</th>
-              <th className="p-3">Trakt ID</th>
-              <th className="p-3">TMDB</th>
-              <th className="p-3">IMDB</th>
-              <th className="p-3">TVDB</th>
+              <th scope="col" className="p-3">AniList ID</th>
+              <th scope="col" className="p-3">Trakt ID</th>
+              <th scope="col" className="p-3">TMDB</th>
+              <th scope="col" className="p-3">IMDB</th>
+              <th scope="col" className="p-3">TVDB</th>
             </tr>
           </thead>
           <tbody>
@@ -45,13 +52,71 @@ export default function MappingsPage() {
                 </td>
               </tr>
             ) : (
-              mappings.map((m, i) => (
-                <tr key={i} className="border-t border-gray-700 hover:bg-gray-750">
-                  <td className="p-3 font-mono">{m.anilistId}</td>
-                  <td className="p-3 font-mono">{m.traktId || '-'}</td>
-                  <td className="p-3 font-mono">{m.tmdbId || '-'}</td>
-                  <td className="p-3 font-mono">{m.imdbId || '-'}</td>
-                  <td className="p-3 font-mono">{m.tvdbId || '-'}</td>
+              mappings.map((m) => (
+                <tr key={`${m.anilistId}-${m.traktId}-${m.tmdbId}-${m.imdbId}-${m.tvdbId}`} className="border-t border-gray-700 hover:bg-gray-750">
+                  <td className="p-3 font-mono">
+                    <a
+                      href={`https://anilist.co/anime/${m.anilistId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:underline"
+                      aria-label={`Open AniList entry ${m.anilistId}`}
+                    >
+                      {m.anilistId}
+                    </a>
+                  </td>
+                  <td className="p-3 font-mono">
+                    {m.traktId ? (
+                      <a
+                        href={`https://trakt.tv/shows/${m.traktId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open Trakt show ${m.traktId}`}
+                      >
+                        {m.traktId}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td className="p-3 font-mono">
+                    {m.tmdbId ? (
+                      <a
+                        href={`https://www.themoviedb.org/tv/${m.tmdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open TMDB TV entry ${m.tmdbId}`}
+                      >
+                        {m.tmdbId}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td className="p-3 font-mono">
+                    {m.imdbId ? (
+                      <a
+                        href={`https://www.imdb.com/title/${m.imdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open IMDB title ${m.imdbId}`}
+                      >
+                        {m.imdbId}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td className="p-3 font-mono">
+                    {m.tvdbId ? (
+                      <a
+                        href={`https://thetvdb.com/dereferrer/series/${m.tvdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                        aria-label={`Open TVDB series ${m.tvdbId}`}
+                      >
+                        {m.tvdbId}
+                      </a>
+                    ) : '-'}
+                  </td>
                 </tr>
               ))
             )}
@@ -68,11 +133,14 @@ export default function MappingsPage() {
         <button
           onClick={fetchMappings}
           disabled={loading}
-          className={`px-4 py-2 rounded font-medium transition-colors ${loading
+          aria-label={loading ? "Refreshing mappings..." : "Refresh mappings"}
+          aria-busy={loading}
+          className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${loading
               ? 'bg-gray-600 cursor-not-allowed text-gray-300'
               : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
         >
+          {loading && <Spinner />}
           {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
