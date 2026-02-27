@@ -38,8 +38,8 @@ async function runFullSync({ isAutomated = false } = {}) {
 
         if (newScrobbles.length === 0) {
             await log('[Full Sync] No new scrobbles found');
-            const nowIso = await markSyncRun();
-            await db.setConfig('lastSyncTimestamp', nowIso);
+            await markSyncRun();
+            await db.setConfig('lastSyncTimestamp', Math.floor(Date.now() / 1000));
             return Response.json({
                 message: 'No new scrobbles from AniList. Sync complete.',
                 synced: 0
@@ -75,8 +75,9 @@ async function runFullSync({ isAutomated = false } = {}) {
         // Let's do a simple loop, as misses are expected to be rare after initial runs.
         for (const anilistId of uniqueAnilistIds) {
             let traktId = null;
-            if (mappingCache.has(anilistId)) {
-                traktId = mappingCache.get(anilistId).traktId;
+            const cachedMapping = mappingCache.get(anilistId);
+            if (cachedMapping && cachedMapping.traktId) {
+                traktId = cachedMapping.traktId;
             } else {
                 // Fallback to individual resolution (API calls)
                 traktId = await resolveTraktId(anilistId);
