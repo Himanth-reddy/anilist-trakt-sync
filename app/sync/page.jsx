@@ -1,12 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-
-const Spinner = () => (
-  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-  </svg>
-);
+import Spinner from '../components/Spinner';
 
 export default function SyncPage() {
     const [manualId, setManualId] = useState('');
@@ -25,6 +19,7 @@ export default function SyncPage() {
     const [modalMode, setModalMode] = useState(null);
     const [modalItems, setModalItems] = useState([]);
     const [previewLoading, setPreviewLoading] = useState(false);
+    const [previewMode, setPreviewMode] = useState(null);
     const [authUrl, setAuthUrl] = useState('');
     const [authCode, setAuthCode] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
@@ -86,6 +81,7 @@ export default function SyncPage() {
     const openPreview = async (mode) => {
         const endpoint = mode === 'completed' ? '/api/completed-sync?preview=1' : '/api/watching-sync?preview=1';
         setPreviewLoading(true);
+        setPreviewMode(mode);
         try {
             const res = await fetch(endpoint);
             const data = await res.json();
@@ -103,6 +99,7 @@ export default function SyncPage() {
             else setWatchingResult({ error: e.message });
         } finally {
             setPreviewLoading(false);
+            setPreviewMode(null);
         }
     };
 
@@ -241,7 +238,7 @@ export default function SyncPage() {
                         placeholder="Enter AniList ID (e.g., 1 for Cowboy Bebop)"
                         aria-label="AniList ID"
                         className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                        onKeyPress={(e) => e.key === 'Enter' && syncShow()}
+                        onKeyDown={(e) => e.key === 'Enter' && syncShow()}
                     />
                     <button
                         onClick={syncShow}
@@ -301,18 +298,18 @@ export default function SyncPage() {
                 <button
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
-                    aria-busy={completedLoading || previewLoading}
+                    aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
                     className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${completedLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                         }`}
                 >
-                    {(completedLoading || (previewLoading && modalMode === 'completed')) && <Spinner />}
+                    {(completedLoading || (previewLoading && previewMode === 'completed')) && <Spinner />}
                     {completedLoading ? 'Syncing...' : 'Sync Completed'}
                 </button>
 
                 <ResultDisplay result={completedResult} />
-                {previewLoading && modalMode === 'completed' && (
+                {previewLoading && previewMode === 'completed' && (
                     <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
                 )}
                 {completedLoading && (
@@ -333,18 +330,18 @@ export default function SyncPage() {
                 <button
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
-                    aria-busy={watchingLoading || previewLoading}
+                    aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
                     className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${watchingLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                         }`}
                 >
-                    {(watchingLoading || (previewLoading && modalMode === 'watching')) && <Spinner />}
+                    {(watchingLoading || (previewLoading && previewMode === 'watching')) && <Spinner />}
                     {watchingLoading ? 'Syncing...' : 'Sync Watching'}
                 </button>
 
                 <ResultDisplay result={watchingResult} />
-                {previewLoading && modalMode === 'watching' && (
+                {previewLoading && previewMode === 'watching' && (
                     <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
                 )}
                 {watchingLoading && (
