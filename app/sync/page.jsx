@@ -266,28 +266,6 @@ export default function SyncPage() {
                     <p id="manualId-hint" className="text-xs text-gray-400 mt-1">
                         Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
                     </p>
-                <div className="flex gap-3 mb-2">
-                    <input
-                        type="text"
-                        value={manualId}
-                        onChange={(e) => setManualId(e.target.value)}
-                        placeholder="Enter AniList ID (e.g., 1 for Cowboy Bebop)"
-                        aria-label="AniList ID"
-                        className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-                        onKeyDown={(e) => e.key === 'Enter' && syncShow()}
-                    />
-                    <button
-                        onClick={syncShow}
-                        disabled={manualLoading}
-                        aria-busy={manualLoading}
-                        className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${manualLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
-                    >
-                        {manualLoading && <Spinner />}
-                        {manualLoading ? 'Syncing...' : 'Sync Show'}
-                    </button>
                 </div>
 
                 <ResultDisplay result={manualResult} />
