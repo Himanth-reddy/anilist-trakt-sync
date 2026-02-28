@@ -289,7 +289,7 @@ export default function SyncPage() {
                     onClick={syncAll}
                     disabled={fullLoading}
                     aria-busy={fullLoading}
-                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${fullLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${fullLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
@@ -315,7 +315,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
                     aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
-                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${completedLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${completedLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                         }`}
@@ -347,7 +347,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
                     aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
-                    className={`inline-flex items-center px-6 py-2 rounded font-medium transition-colors ${watchingLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${watchingLoading
                         ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                         : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                         }`}
@@ -432,7 +432,7 @@ export default function SyncPage() {
                         onClick={getTraktAuthUrl}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${authLoading
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded font-medium transition-colors ${authLoading
                             ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                             : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
@@ -465,7 +465,7 @@ export default function SyncPage() {
                         onClick={exchangeTraktCode}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${authLoading
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded font-medium transition-colors ${authLoading
                             ? 'bg-gray-600 cursor-not-allowed text-gray-300'
                             : 'bg-green-600 hover:bg-green-700 text-white'
                             }`}
