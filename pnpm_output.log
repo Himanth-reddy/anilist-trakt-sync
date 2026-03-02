@@ -263,3 +263,71 @@ Import trace:
 
 
  POST /api/manual-map 200 in 23ms (compile: 11ms, render: 12ms)
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+Error while requesting resource
+There was an issue establishing a connection while requesting https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+next/font: warning:
+Failed to download `Inter` from Google Fonts. Using fallback font instead.
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+ GET /manual 200 in 1871ms (compile: 592ms, render: 1279ms)
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+Error while requesting resource
+There was an issue establishing a connection while requesting https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+next/font: warning:
+Failed to download `Inter` from Google Fonts. Using fallback font instead.
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+Error while requesting resource
+There was an issue establishing a connection while requesting https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+⚠ [next]/internal/font/google/inter_b006827b.module.css
+next/font: warning:
+Failed to download `Inter` from Google Fonts. Using fallback font instead.
+
+Import trace:
+  Server Component:
+    [next]/internal/font/google/inter_b006827b.module.css
+    [next]/internal/font/google/inter_b006827b.js
+    ./app/layout.jsx
+
+
+ POST /api/manual-map 200 in 29ms (compile: 14ms, render: 15ms)
