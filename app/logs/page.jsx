@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Spinner from '../components/Spinner';
 
 const DATE_TIME_FORMAT = {
   year: 'numeric',
@@ -72,9 +73,16 @@ export default function Logs() {
           )}
           <button
             onClick={fetchLogs}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-100"
+            disabled={loading}
+            aria-label={loading ? "Refreshing logs" : "Refresh logs"}
+            aria-busy={loading}
+            className={`inline-flex items-center gap-1 px-3 py-1 rounded transition-colors ${loading
+                ? 'bg-gray-600 cursor-not-allowed text-gray-400'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+              }`}
           >
-            Refresh
+            {loading && <Spinner />}
+            {loading ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
       </div>
