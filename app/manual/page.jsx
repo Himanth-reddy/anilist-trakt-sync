@@ -19,6 +19,7 @@ export default function Manual() {
 
   const submit = async e => {
     e.preventDefault();
+    if (loading) return;
     setStatus('Saving...');
     setLoading(true);
     try {
