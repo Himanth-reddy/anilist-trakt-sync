@@ -1,0 +1,3 @@
+## 2024-03-02 - N+1 query pattern fixed in sync iteration loops
+**Learning:** Found a major N+1 query problem where `await db.getSyncProgress(anilistShowId)` and `await resolveTraktId(anilistShowId)` were called inside the main scrobble-processing loop for both `completed-sync` and `watching-sync` API routes.
+**Action:** When working on array-processing loops that make database or API calls, always verify if those calls can be extracted outside the loop and converted to batch fetches (e.g., using `Promise.all` over unique IDs). Using `db.getBatchSyncProgress` and `db.getBatchMappings` before the loop prevents dozens/hundreds of sequential awaited DB connections.
