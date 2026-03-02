@@ -4,20 +4,27 @@ import Spinner from '../components/Spinner';
 
 export default function Manual() {
   const [form, setForm] = useState({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(null); // { message: string, type: 'success' | 'error' }
   const [loading, setLoading] = useState(false);
 
   const handle = e => setForm({ ...form, [e.target.name]: e.target.value });
   const submit = async e => {
     e.preventDefault();
     setLoading(true);
-    setStatus('');
+    setStatus(null);
     try {
       const res = await fetch('/api/manual-map', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const j = await res.json();
-      setStatus(j.success ? 'Saved ✅' : ('Failed: ' + (j.error || 'unknown')));
+      setStatus({
+        message: j.success ? 'Saved ✅' : ('Failed: ' + (j.error || 'unknown')),
+        type: j.success ? 'success' : 'error'
+      });
     } catch (err) {
-      setStatus('Failed: ' + err.message);
+      const message = err instanceof Error ? err.message : String(err);
+      setStatus({
+        message: 'Failed: ' + (message || 'unknown error'),
+        type: 'error'
+      });
     } finally {
       setLoading(false);
     }
@@ -71,13 +78,13 @@ export default function Manual() {
         </button>
       </form>
 
-      {status && (
+      {status && status.message && (
         <div
           role="status"
           aria-live="polite"
-          className={`mt-4 p-4 rounded border max-w-xl ${status.includes('Saved') ? 'bg-green-900/50 text-green-200 border-green-800' : 'bg-red-900/50 text-red-200 border-red-800'}`}
+          className={`mt-4 p-4 rounded border max-w-xl ${status.type === 'success' ? 'bg-green-900/50 text-green-200 border-green-800' : 'bg-red-900/50 text-red-200 border-red-800'}`}
         >
-          {status}
+          {status.message}
         </div>
       )}
     </div>
