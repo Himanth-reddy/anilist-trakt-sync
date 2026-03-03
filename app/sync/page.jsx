@@ -195,32 +195,32 @@ export default function SyncPage() {
     };
 
     const ResultDisplay = ({ result }) => {
-        if (!result) return null;
-
-        if (result.error) {
-            return (
-                <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded border border-red-800">
-                    <strong>Error:</strong> {result.error}
-                </div>
-            );
-        }
-
         return (
-            <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800">
-                <p className="font-medium mb-2">✓ Sync Successful</p>
-                {result.count !== undefined && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
-                {result.synced !== undefined && <p>Episodes processed: <span className="font-mono">{result.synced}</span></p>}
-                {result.found !== undefined && <p>Scrobbles found: <span className="font-mono">{result.found}</span></p>}
-                {result.message && <p className="text-sm mt-2 text-green-300">{result.message}</p>}
-                {result.added && result.added.episodes !== undefined && (
-                    <p className="text-sm mt-2 font-medium">
-                        Posted to Trakt: <span className="font-mono">{result.added.episodes}</span> episodes
-                    </p>
-                )}
-                {result.addedEpisodes !== undefined && (
-                    <p className="text-sm mt-2 font-medium">
-                        Posted to Trakt: <span className="font-mono">{result.addedEpisodes}</span> episodes
-                    </p>
+            <div aria-live="polite" aria-atomic="true">
+                {result && (
+                    result.error ? (
+                        <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded border border-red-800" role="alert">
+                            <strong>Error:</strong> {result.error}
+                        </div>
+                    ) : (
+                        <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800" role="status">
+                            <p className="font-medium mb-2">✓ Sync Successful</p>
+                            {result.count !== undefined && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
+                            {result.synced !== undefined && <p>Episodes processed: <span className="font-mono">{result.synced}</span></p>}
+                            {result.found !== undefined && <p>Scrobbles found: <span className="font-mono">{result.found}</span></p>}
+                            {result.message && <p className="text-sm mt-2 text-green-300">{result.message}</p>}
+                            {result.added && result.added.episodes !== undefined && (
+                                <p className="text-sm mt-2 font-medium">
+                                    Posted to Trakt: <span className="font-mono">{result.added.episodes}</span> episodes
+                                </p>
+                            )}
+                            {result.addedEpisodes !== undefined && (
+                                <p className="text-sm mt-2 font-medium">
+                                    Posted to Trakt: <span className="font-mono">{result.addedEpisodes}</span> episodes
+                                </p>
+                            )}
+                        </div>
+                    )
                 )}
             </div>
         );
@@ -370,8 +370,8 @@ export default function SyncPage() {
 
             {modalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
-                        <h4 className="text-lg font-semibold mb-3">
+                    <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                        <h4 id="modal-title" className="text-lg font-semibold mb-3">
                             {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                         </h4>
                         <div className="max-h-[400px] overflow-y-auto text-sm space-y-2">
@@ -475,12 +475,14 @@ export default function SyncPage() {
                     </button>
                 </div>
 
-                {authResult?.error && (
-                    <div className="text-red-400 text-sm mt-2">{authResult.error}</div>
-                )}
-                {authResult?.message && (
-                    <div className="text-green-400 text-sm mt-2">{authResult.message}</div>
-                )}
+                <div aria-live="polite" aria-atomic="true">
+                    {authResult?.error && (
+                        <div className="text-red-400 text-sm mt-2" role="alert">{authResult.error}</div>
+                    )}
+                    {authResult?.message && (
+                        <div className="text-green-400 text-sm mt-2" role="status">{authResult.message}</div>
+                    )}
+                </div>
             </div>
         </div>
     );
