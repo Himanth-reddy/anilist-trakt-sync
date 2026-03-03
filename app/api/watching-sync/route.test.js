@@ -12,6 +12,10 @@ import { translateAnilistToTrakt } from '../../../lib/translator.js';
 vi.mock('../../../utils/db.js', () => ({
   db: {
     getSyncProgress: vi.fn(),
+    getBatchSyncProgress: vi.fn(),
+    getBatchMappings: vi.fn(),
+    getBatchConfigs: vi.fn(),
+    getBatchEpisodeOverrides: vi.fn(),
     setSyncProgress: vi.fn(),
     setConfig: vi.fn(),
     getEpisodeOverrides: vi.fn(),
@@ -39,6 +43,10 @@ describe('watching-sync POST', () => {
       { anilistShowId: 100, showTitle: 'Test Show', progress: 5, totalEpisodes: 12 }
     ]);
     db.getSyncProgress.mockResolvedValue(0); // Nothing synced yet
+    db.getBatchSyncProgress.mockResolvedValue({});
+    db.getBatchMappings.mockResolvedValue({});
+    db.getBatchConfigs.mockResolvedValue({});
+    db.getBatchEpisodeOverrides.mockResolvedValue({});
     resolveTraktId.mockResolvedValue('trakt-100');
     getBreakpointMap.mockResolvedValue({ breakpoints: [] });
     db.getEpisodeOverrides.mockResolvedValue({});
