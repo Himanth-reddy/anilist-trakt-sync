@@ -7,4 +7,5 @@
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-✓ Ready in 286ms
+✓ Ready in 474ms
+[Anilist] HTTP error fetching user ID: 400 Bad Request

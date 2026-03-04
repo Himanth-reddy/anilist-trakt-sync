@@ -370,8 +370,8 @@ export default function SyncPage() {
 
             {modalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
-                        <h4 className="text-lg font-semibold mb-3">
+                    <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
+                        <h4 id="modal-title" className="text-lg font-semibold mb-3">
                             {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                         </h4>
                         <div className="max-h-[400px] overflow-y-auto text-sm space-y-2">
