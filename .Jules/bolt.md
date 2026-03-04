@@ -1,0 +1,3 @@
+## 2024-05-17 - Fix N+1 queries in Sync Routes
+**Learning:** In standard library sync operations, fetching mapping data (`db.getMapping`), breakpoints (`db.getConfig`), progress (`db.getSyncProgress`), and overrides (`db.getEpisodeOverrides`) one-by-one inside a for-loop per Anilist show entry creates severe N+1 query bottlenecks in Supabase.
+**Action:** Always pre-fetch and cache database entities in batch using array of unique IDs before looping through items. Follow `db.getBatch*` methods and map standard caches before any heavy data loop for processing external data sync.
