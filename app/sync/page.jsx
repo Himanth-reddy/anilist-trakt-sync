@@ -370,7 +370,7 @@ export default function SyncPage() {
 
             {modalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
+                    <div role="dialog" aria-modal="true" className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
                         <h4 className="text-lg font-semibold mb-3">
                             {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                         </h4>
@@ -452,13 +452,18 @@ export default function SyncPage() {
                     )}
                 </div>
 
+                <div className="mb-1">
+                    <label htmlFor="authCode" className="block text-sm font-medium mb-1 text-gray-300">
+                        Trakt Auth Code
+                    </label>
+                </div>
                 <div className="flex gap-3 mb-2">
                     <input
+                        id="authCode"
                         type="text"
                         value={authCode}
                         onChange={(e) => setAuthCode(e.target.value)}
                         placeholder="Paste Trakt auth code here"
-                        aria-label="Trakt Auth Code"
                         className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
                     />
                     <button
@@ -475,12 +480,14 @@ export default function SyncPage() {
                     </button>
                 </div>
 
-                {authResult?.error && (
-                    <div className="text-red-400 text-sm mt-2">{authResult.error}</div>
-                )}
-                {authResult?.message && (
-                    <div className="text-green-400 text-sm mt-2">{authResult.message}</div>
-                )}
+                <div role="status" aria-live="polite">
+                    {authResult?.error && (
+                        <div className="text-red-400 text-sm mt-2">{authResult.error}</div>
+                    )}
+                    {authResult?.message && (
+                        <div className="text-green-400 text-sm mt-2">{authResult.message}</div>
+                    )}
+                </div>
             </div>
         </div>
     );
