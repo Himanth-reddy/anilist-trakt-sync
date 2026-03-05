@@ -1,0 +1,3 @@
+## 2024-05-24 - N+1 Query Optimization in Batch Processes
+**Learning:** Found N+1 query bottlenecks in `watching-sync` and `completed-sync` routes where database calls were made inside iteration loops.
+**Action:** Always extract database queries outside of iteration loops and utilize batch fetch functions (like `db.getBatchMappings` and `db.getBatchSyncProgress`) to load necessary data into memory first. This prevents multiple single database hits and improves backend API performance.

@@ -64,6 +64,13 @@ export async function POST() {
     const overrideCache = new Map();
     let skippedAlreadySynced = 0;
 
+    // Bolt: Pre-fetch mappings and progress to avoid N+1 queries
+    const uniqueAnilistIds = [...new Set(previewItems.map(i => i.anilistShowId))];
+    const [batchProgress, batchMappings] = await Promise.all([
+      db.getBatchSyncProgress(uniqueAnilistIds),
+      db.getBatchMappings(uniqueAnilistIds)
+    ]);
+
     const getOverrideMap = async (traktId) => {
       if (overrideCache.has(traktId)) return overrideCache.get(traktId);
       const overrides = await db.getEpisodeOverrides(traktId);
@@ -72,13 +79,14 @@ export async function POST() {
     };
 
     for (const item of previewItems) {
-      const lastSyncedAbs = await db.getSyncProgress(item.anilistShowId);
+      const lastSyncedAbs = batchProgress[item.anilistShowId] || 0;
       if (item.progress <= lastSyncedAbs) {
         skippedAlreadySynced += 1;
         continue;
       }
 
-      const traktId = await resolveTraktId(item.anilistShowId);
+      const cachedMapping = batchMappings[item.anilistShowId];
+      const traktId = cachedMapping && cachedMapping.traktId ? cachedMapping.traktId : await resolveTraktId(item.anilistShowId);
       if (!traktId) {
         console.warn(`[Library Sync] SKIP: No Trakt ID for AniList ${item.anilistShowId}`);
         continue;
