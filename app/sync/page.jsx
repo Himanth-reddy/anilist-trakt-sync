@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
@@ -25,6 +25,14 @@ export default function SyncPage() {
     const [authCode, setAuthCode] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
     const [authResult, setAuthResult] = useState(null);
+
+    const modalRef = useRef(null);
+
+    useEffect(() => {
+        if (modalOpen && modalRef.current) {
+            modalRef.current.focus();
+        }
+    }, [modalOpen]);
 
     useEffect(() => {
         fetch('/api/status', { cache: 'no-store' })
@@ -369,8 +377,8 @@ export default function SyncPage() {
             </div>
 
             {modalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5">
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}>
+                    <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="modal-title" tabIndex={-1} className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5 outline-none" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === 'Escape') { setModalOpen(false); setModalItems([]); setModalMode(null); }}}>
                         <h4 id="modal-title" className="text-lg font-semibold mb-3">
                             {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                         </h4>
