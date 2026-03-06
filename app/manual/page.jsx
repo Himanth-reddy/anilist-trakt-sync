@@ -47,6 +47,7 @@ export default function Manual() {
               {labels[f]}
             </label>
             <input
+              type="text"
               id={f}
               name={f}
               value={form[f]}
@@ -67,11 +68,13 @@ export default function Manual() {
           {loading ? 'Saving...' : 'Save'}
         </button>
       </form>
-      {status && (
-        <p className="mt-3 text-gray-300" aria-live="polite">
-          {status}
-        </p>
-      )}
+      <div aria-live="polite" aria-atomic="true">
+        {status && (
+          <p className="mt-3 text-gray-300" role="status">
+            {status}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
