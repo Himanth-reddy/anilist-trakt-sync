@@ -33,9 +33,11 @@ export default function Logs() {
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [isManualRefresh, setIsManualRefresh] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (isManual = false) => {
+    if (isManual) setIsManualRefresh(true);
     try {
       setLoading(true);
       setError('');
@@ -54,12 +56,13 @@ export default function Logs() {
       setError('Failed to load logs.');
     } finally {
       setLoading(false);
+      if (isManual) setIsManualRefresh(false);
     }
   };
 
   useEffect(() => {
     fetchLogs();
-    const interval = setInterval(fetchLogs, 5000);
+    const interval = setInterval(() => fetchLogs(false), 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -72,17 +75,17 @@ export default function Logs() {
             <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
           )}
           <button
-            onClick={fetchLogs}
-            disabled={loading}
-            aria-label={loading ? "Refreshing logs" : "Refresh logs"}
-            aria-busy={loading}
-            className={`inline-flex items-center gap-1 px-3 py-1 rounded transition-colors ${loading
+            onClick={() => fetchLogs(true)}
+            disabled={isManualRefresh}
+            aria-label={isManualRefresh ? "Refreshing logs" : "Refresh logs"}
+            aria-busy={isManualRefresh}
+            className={`inline-flex items-center px-3 py-1 rounded transition-colors ${isManualRefresh
                 ? 'bg-gray-600 cursor-not-allowed text-gray-400'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
               }`}
           >
-            {loading && <Spinner />}
-            {loading ? 'Refreshing...' : 'Refresh'}
+            {isManualRefresh && <Spinner />}
+            {isManualRefresh ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
       </div>
