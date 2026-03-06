@@ -199,11 +199,11 @@ export default function SyncPage() {
             <div aria-live="polite" aria-atomic="true">
                 {result && (
                     result.error ? (
-                        <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded border border-red-800" role="alert">
+                        <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded border border-red-800">
                             <strong>Error:</strong> {result.error}
                         </div>
                     ) : (
-                        <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800" role="status">
+                        <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800">
                             <p className="font-medium mb-2">✓ Sync Successful</p>
                             {result.count !== undefined && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
                             {result.synced !== undefined && <p>Episodes processed: <span className="font-mono">{result.synced}</span></p>}
@@ -477,10 +477,10 @@ export default function SyncPage() {
 
                 <div aria-live="polite" aria-atomic="true">
                     {authResult?.error && (
-                        <div className="text-red-400 text-sm mt-2" role="alert">{authResult.error}</div>
+                        <div className="text-red-400 text-sm mt-2">{authResult.error}</div>
                     )}
                     {authResult?.message && (
-                        <div className="text-green-400 text-sm mt-2" role="status">{authResult.message}</div>
+                        <div className="text-green-400 text-sm mt-2">{authResult.message}</div>
                     )}
                 </div>
             </div>
