@@ -71,8 +71,67 @@ export async function POST() {
       db.getBatchMappings(uniqueAnilistIds)
     ]);
 
+    // Filter out shows that are already synced to avoid unnecessary ID resolution/fetching
+    const anilistIdsNeedingSyncSet = new Set();
+    for (const item of previewItems) {
+      const lastSyncedAbs = batchProgress[item.anilistShowId] || 0;
+      if (item.progress > lastSyncedAbs) {
+        anilistIdsNeedingSyncSet.add(item.anilistShowId);
+      }
+    }
+    const anilistIdsNeedingSync = [...anilistIdsNeedingSyncSet];
+
+    // Pre-resolve Trakt IDs to allow batch fetching configs/overrides
+    const anilistToTraktMap = new Map();
+    const resolvedTraktIds = new Set();
+
+    for (const anilistId of anilistIdsNeedingSync) {
+      let traktId = batchMappings[anilistId]?.traktId;
+      if (!traktId) {
+        // Skip DB check since batchMappings already told us it's missing
+        traktId = await resolveTraktId(anilistId, { skipDbCheck: true });
+      }
+      if (traktId) {
+        anilistToTraktMap.set(anilistId, traktId);
+        resolvedTraktIds.add(traktId);
+      }
+    }
+
+    // Batch fetch secondary data (configs and overrides)
+    const uniqueTraktIds = [...resolvedTraktIds];
+    const breakpointMapCache = new Map();
+
+    if (uniqueTraktIds.length > 0) {
+      const mapKeys = uniqueTraktIds.map(id => `map:${id}`);
+      const [batchConfigs, batchOverrides] = await Promise.all([
+        db.getBatchConfigs(mapKeys),
+        db.getBatchEpisodeOverrides(uniqueTraktIds)
+      ]);
+
+      for (const [key, val] of Object.entries(batchConfigs)) {
+        const traktId = key.split(':')[1];
+        if (traktId) {
+          const numTraktId = Number(traktId);
+          if (Number.isFinite(numTraktId)) {
+            breakpointMapCache.set(numTraktId, val);
+          }
+          breakpointMapCache.set(String(traktId), val);
+        }
+      }
+
+      for (const [id, val] of Object.entries(batchOverrides)) {
+        const numId = Number(id);
+        if (Number.isFinite(numId)) {
+          overrideCache.set(numId, val);
+        }
+        overrideCache.set(String(id), val);
+      }
+    }
+
     const getOverrideMap = async (traktId) => {
-      if (overrideCache.has(traktId)) return overrideCache.get(traktId);
+      const numTraktId = Number(traktId);
+      if (Number.isFinite(numTraktId) && overrideCache.has(numTraktId)) return overrideCache.get(numTraktId);
+      if (overrideCache.has(String(traktId))) return overrideCache.get(String(traktId));
       const overrides = await db.getEpisodeOverrides(traktId);
       overrideCache.set(traktId, overrides);
       return overrides;
@@ -85,17 +144,20 @@ export async function POST() {
         continue;
       }
 
-      let traktId = batchMappings[item.anilistShowId]?.traktId;
-      if (!traktId) {
-          traktId = await resolveTraktId(item.anilistShowId);
-      }
-
+      const traktId = anilistToTraktMap.get(item.anilistShowId);
       if (!traktId) {
         console.warn(`[Library Sync] SKIP: No Trakt ID for AniList ${item.anilistShowId}`);
         continue;
       }
 
-      const breakpointMap = await getBreakpointMap(traktId);
+      let breakpointMap = breakpointMapCache.get(traktId) || breakpointMapCache.get(String(traktId));
+      if (!breakpointMap) {
+        breakpointMap = await getBreakpointMap(traktId);
+        if (breakpointMap) {
+          breakpointMapCache.set(traktId, breakpointMap);
+        }
+      }
+
       if (!breakpointMap) {
         console.warn(`[Library Sync] SKIP: No map for Trakt ID ${traktId}`);
         continue;

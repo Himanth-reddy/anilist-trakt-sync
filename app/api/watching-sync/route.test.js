@@ -16,7 +16,9 @@ vi.mock('../../../utils/db.js', () => ({
     getBatchMappings: vi.fn(),
     setSyncProgress: vi.fn(),
     setConfig: vi.fn(),
+    getBatchConfigs: vi.fn(),
     getEpisodeOverrides: vi.fn(),
+    getBatchEpisodeOverrides: vi.fn(),
   },
 }));
 vi.mock('../../../lib/anilist.js');
@@ -42,11 +44,19 @@ describe('watching-sync POST', () => {
     ]);
     db.getSyncProgress.mockResolvedValue(0); // Nothing synced yet
     db.getBatchSyncProgress.mockResolvedValue({ 100: 0 });
-    db.getBatchMappings.mockResolvedValue({});
-    resolveTraktId.mockResolvedValue('trakt-100');
+    db.getBatchMappings.mockResolvedValue({
+      100: { traktId: 100 }
+    });
+    resolveTraktId.mockResolvedValue(100);
     getBreakpointMap.mockResolvedValue({ breakpoints: [] });
+    db.getBatchConfigs.mockResolvedValue({
+      'map:100': [{ season: 1, starts_at: 1 }]
+    });
     db.getEpisodeOverrides.mockResolvedValue({});
-    translateAnilistToTrakt.mockImplementation((scrobble) => ({ ...scrobble, traktShowId: 'trakt-100' }));
+    db.getBatchEpisodeOverrides.mockResolvedValue({
+      '100': { 5: { season: 2, episode: 1 } }
+    });
+    translateAnilistToTrakt.mockImplementation((scrobble) => ({ ...scrobble, traktShowId: 100 }));
   });
 
   it('should not update database if postToTrakt fails', async () => {
@@ -60,6 +70,11 @@ describe('watching-sync POST', () => {
     expect(postToTrakt).toHaveBeenCalled();
     // The key expectation: setSyncProgress should NOT be called if Trakt sync failed
     expect(db.setSyncProgress).not.toHaveBeenCalled();
+
+    // Verify optimization works: getBreakpointMap should NOT be called because cache hits
+    expect(getBreakpointMap).not.toHaveBeenCalled();
+    // And overrides should be from batch
+    expect(db.getEpisodeOverrides).not.toHaveBeenCalled();
 
     // We expect the function to return an error response because we threw an error (after fix)
     // Or at least return a response indicating failure
