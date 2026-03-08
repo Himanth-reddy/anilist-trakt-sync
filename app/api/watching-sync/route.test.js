@@ -45,18 +45,18 @@ describe('watching-sync POST', () => {
     db.getSyncProgress.mockResolvedValue(0); // Nothing synced yet
     db.getBatchSyncProgress.mockResolvedValue({ 100: 0 });
     db.getBatchMappings.mockResolvedValue({
-      100: { traktId: 'trakt-100' }
+      100: { traktId: 100 }
     });
-    resolveTraktId.mockResolvedValue('trakt-100');
+    resolveTraktId.mockResolvedValue(100);
     getBreakpointMap.mockResolvedValue({ breakpoints: [] });
     db.getBatchConfigs.mockResolvedValue({
-      'map:trakt-100': [{ season: 1, starts_at: 1 }]
+      'map:100': [{ season: 1, starts_at: 1 }]
     });
     db.getEpisodeOverrides.mockResolvedValue({});
     db.getBatchEpisodeOverrides.mockResolvedValue({
-      'trakt-100': { 5: { season: 2, episode: 1 } }
+      '100': { 5: { season: 2, episode: 1 } }
     });
-    translateAnilistToTrakt.mockImplementation((scrobble) => ({ ...scrobble, traktShowId: 'trakt-100' }));
+    translateAnilistToTrakt.mockImplementation((scrobble) => ({ ...scrobble, traktShowId: 100 }));
   });
 
   it('should not update database if postToTrakt fails', async () => {

@@ -71,14 +71,25 @@ export async function POST() {
       db.getBatchMappings(uniqueAnilistIds)
     ]);
 
+    // Filter out shows that are already synced to avoid unnecessary ID resolution/fetching
+    const anilistIdsNeedingSyncSet = new Set();
+    for (const item of previewItems) {
+      const lastSyncedAbs = batchProgress[item.anilistShowId] || 0;
+      if (item.progress > lastSyncedAbs) {
+        anilistIdsNeedingSyncSet.add(item.anilistShowId);
+      }
+    }
+    const anilistIdsNeedingSync = [...anilistIdsNeedingSyncSet];
+
     // Pre-resolve Trakt IDs to allow batch fetching configs/overrides
     const anilistToTraktMap = new Map();
     const resolvedTraktIds = new Set();
 
-    for (const anilistId of uniqueAnilistIds) {
+    for (const anilistId of anilistIdsNeedingSync) {
       let traktId = batchMappings[anilistId]?.traktId;
       if (!traktId) {
-        traktId = await resolveTraktId(anilistId);
+        // Skip DB check since batchMappings already told us it's missing
+        traktId = await resolveTraktId(anilistId, { skipDbCheck: true });
       }
       if (traktId) {
         anilistToTraktMap.set(anilistId, traktId);
@@ -100,19 +111,26 @@ export async function POST() {
       for (const [key, val] of Object.entries(batchConfigs)) {
         const traktId = key.split(':')[1];
         if (traktId) {
-          breakpointMapCache.set(Number(traktId), val);
+          const numTraktId = Number(traktId);
+          if (Number.isFinite(numTraktId)) {
+            breakpointMapCache.set(numTraktId, val);
+          }
           breakpointMapCache.set(String(traktId), val);
         }
       }
 
       for (const [id, val] of Object.entries(batchOverrides)) {
-        overrideCache.set(Number(id), val);
+        const numId = Number(id);
+        if (Number.isFinite(numId)) {
+          overrideCache.set(numId, val);
+        }
         overrideCache.set(String(id), val);
       }
     }
 
     const getOverrideMap = async (traktId) => {
-      if (overrideCache.has(traktId)) return overrideCache.get(traktId);
+      const numTraktId = Number(traktId);
+      if (Number.isFinite(numTraktId) && overrideCache.has(numTraktId)) return overrideCache.get(numTraktId);
       if (overrideCache.has(String(traktId))) return overrideCache.get(String(traktId));
       const overrides = await db.getEpisodeOverrides(traktId);
       overrideCache.set(traktId, overrides);
