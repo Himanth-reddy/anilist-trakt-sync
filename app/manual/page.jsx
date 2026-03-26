@@ -41,21 +41,26 @@ export default function Manual() {
     <div>
       <h2 className="text-2xl font-bold mb-4">Manual Mapping</h2>
       <form onSubmit={submit} className="bg-gray-800 p-4 rounded space-y-3">
-        {Object.keys(labels).map(f => (
-          <div key={f}>
-            <label htmlFor={f} className="block text-gray-300 mb-1">
-              {labels[f]}
-            </label>
-            <input
-              type="text"
-              id={f}
-              name={f}
-              value={form[f]}
-              onChange={handle}
-              className="w-full bg-gray-900 p-2 rounded border border-gray-700 focus:border-blue-500 focus:outline-none transition-colors"
-            />
-          </div>
-        ))}
+        {Object.keys(labels).map(f => {
+          const isRequired = f === 'anilistId' || f === 'traktId';
+          return (
+            <div key={f}>
+              <label htmlFor={f} className="block text-gray-300 mb-1">
+                {labels[f]} {isRequired && <span className="text-red-500" aria-hidden="true">*</span>}
+              </label>
+              <input
+                type="text"
+                id={f}
+                name={f}
+                value={form[f]}
+                onChange={handle}
+                required={isRequired}
+                aria-required={isRequired}
+                className="w-full bg-gray-900 p-2 rounded border border-gray-700 focus:border-blue-500 focus:outline-none transition-colors"
+              />
+            </div>
+          );
+        })}
         <button
           disabled={loading}
           aria-busy={loading}
