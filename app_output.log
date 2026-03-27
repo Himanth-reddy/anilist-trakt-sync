@@ -1,0 +1,13 @@
+
+> anilist-trakt-sync@ dev /app
+> next dev
+
+⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.0.2:3001
+
+✓ Starting...
+✓ Ready in 776ms
+○ Compiling /manual ...
+ GET /manual 200 in 3.8s (compile: 3.4s, render: 327ms)
