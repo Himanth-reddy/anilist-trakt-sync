@@ -11,3 +11,7 @@
 ## 2025-03-07 - Skip-to-content links and focus visibility
 **Learning:** In Next.js client applications, navigating between routes via `<a>` or Next.js `<Link>` components can trap keyboard users in the top navigation menu, requiring them to repeatedly Tab through all links to reach the main page content. Furthermore, bare anchors without explicit focus styles fail to indicate the current focus position when navigating via keyboard.
 **Action:** Always include a "Skip to main content" link (with `.sr-only.focus:not-sr-only`) at the top of the body that points to the `<main id="main-content">` area (which should have `tabIndex="-1"`). Add explicit focus rings (`focus-visible:ring-2 focus-visible:outline-none`) to all navigation links to provide clear visual feedback to keyboard users without impacting mouse/touch interactions.
+
+## 2024-03-28 - Custom Modals Require Explicit Dismissal Handlers
+**Learning:** Custom `div`-based overlays with `role="dialog"` do not inherit the native dismissal behaviors of the HTML `<dialog>` element. Without explicit click handlers on the backdrop overlay and `keydown` listeners for the `Escape` key, users can be completely trapped in the dialog visually and practically.
+**Action:** When implementing custom modal components using `div` elements, always include an `onClick` handler on the transparent overlay to close the modal, add `onClick={(e) => e.stopPropagation()}` to the modal content wrapper, and attach a persistent `keydown` listener for the `Escape` key while the modal is open.
