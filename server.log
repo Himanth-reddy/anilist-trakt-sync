@@ -1,10 +1,24 @@
 
-> anilist-trakt-sync@ start /app
-> next start
+> dev
+> next dev
 
-▲ Next.js 16.1.6
+▲ Next.js 16.1.6 (Turbopack)
 - Local:         http://localhost:3000
 - Network:       http://192.168.0.2:3000
 
 ✓ Starting...
-✓ Ready in 294ms
+✓ Ready in 719ms
+○ Compiling /sync ...
+ GET /sync 200 in 4.6s (compile: 4.0s, render: 524ms)
+ GET /api/status 200 in 1149ms (compile: 1118ms, render: 31ms)
+○ Compiling /api/completed-sync ...
+[Anilist] HTTP error fetching user ID: 400 Bad Request
+ GET /api/completed-sync?preview=1 200 in 5.4s (compile: 5.3s, render: 129ms)
+[Anilist] HTTP error fetching user ID: 400 Bad Request
+ GET /api/completed-sync?preview=1 200 in 56ms (compile: 4ms, render: 52ms)
+ GET /sync 200 in 79ms (compile: 4ms, render: 75ms)
+ GET /api/status 200 in 12ms (compile: 8ms, render: 5ms)
+[Anilist] HTTP error fetching user ID: 400 Bad Request
+ GET /api/completed-sync?preview=1 200 in 125ms (compile: 5ms, render: 120ms)
+[Anilist] HTTP error fetching user ID: 400 Bad Request
+ GET /api/completed-sync?preview=1 200 in 77ms (compile: 5ms, render: 72ms)

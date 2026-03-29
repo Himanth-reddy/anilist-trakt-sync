@@ -33,6 +33,22 @@ export default function SyncPage() {
             .catch(() => { });
     }, []);
 
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && modalOpen) {
+                setModalOpen(false);
+                setModalItems([]);
+                setModalMode(null);
+            }
+        };
+
+        if (modalOpen) {
+            window.addEventListener('keydown', handleKeyDown);
+        }
+
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [modalOpen]);
+
     const handleManualIdChange = (e) => {
         const val = e.target.value;
         const extracted = extractAnilistId(val);
@@ -369,8 +385,17 @@ export default function SyncPage() {
             </div>
 
             {modalOpen && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <div
+                    className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+                    onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
+                >
+                    <div
+                        className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modal-title"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <h4 id="modal-title" className="text-lg font-semibold mb-3">
                             {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                         </h4>
