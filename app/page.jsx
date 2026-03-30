@@ -95,7 +95,7 @@ export default function Page() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Otaku Status Card */}
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">Otaku Mappings DB</h3>
             <button
@@ -103,9 +103,9 @@ export default function Page() {
               disabled={otakuLoading}
               aria-label={otakuLoading ? "Refreshing Otaku Mappings Database" : "Update Otaku Mappings Database"}
               aria-busy={otakuLoading}
-              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${otakuLoading
-                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              className={`inline-flex items-center px-3 py-1 text-sm rounded-lg font-medium transition-colors ${otakuLoading
+                ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                 }`}
             >
               {otakuLoading && <Spinner />}
@@ -119,9 +119,9 @@ export default function Page() {
             ) : (
               <div className="space-y-2">
                 <p>Entries: <span className="font-mono text-lg text-green-400">{otakuStatus.count?.toLocaleString() ?? '0'}</span></p>
-                <p className="text-sm text-gray-400">Updated: {formatTimestamp(otakuStatus.lastSync)}</p>
+                <p className="text-sm text-gray-500">Updated: {formatTimestamp(otakuStatus.lastSync)}</p>
                 {otakuStatus.lastActivity ? (
-                  <p className="text-sm text-gray-400">Source Updated: {formatTimestamp(otakuStatus.lastActivity)}</p>
+                  <p className="text-sm text-gray-500">Source Updated: {formatTimestamp(otakuStatus.lastActivity)}</p>
                 ) : null}
               </div>
             )
@@ -131,7 +131,7 @@ export default function Page() {
         </div>
 
         {/* Fribbs Status Card */}
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">Fribbs Database</h3>
             <button
@@ -139,9 +139,9 @@ export default function Page() {
               disabled={loading}
               aria-label={loading ? "Refreshing Fribbs Database" : "Update Fribbs Database"}
               aria-busy={loading}
-              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${loading
-                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              className={`inline-flex items-center px-3 py-1 text-sm rounded-lg font-medium transition-colors ${loading
+                ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                 }`}
             >
               {loading && <Spinner />}
@@ -155,7 +155,7 @@ export default function Page() {
             ) : (
               <div className="space-y-2">
                 <p>Entries: <span className="font-mono text-lg text-green-400">{status.count?.toLocaleString() ?? '0'}</span></p>
-                <p className="text-sm text-gray-400">Updated: {formatTimestamp(status.lastSync)}</p>
+                <p className="text-sm text-gray-500">Updated: {formatTimestamp(status.lastSync)}</p>
               </div>
             )
           ) : (
@@ -164,17 +164,17 @@ export default function Page() {
         </div>
 
         {/* Sync Status Card */}
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none">
           <h3 className="text-xl font-semibold mb-4">Sync Status</h3>
           <div className="space-y-2">
             <p>Last Automated Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastAutomatedSync ? formatTimestamp(syncStatus.lastAutomatedSync) : 'Checking...'}</span></p>
             <p>Last Manual Sync: <span className="font-mono text-lg text-blue-400">{syncStatus?.lastManualSync ? formatTimestamp(syncStatus.lastManualSync) : 'Never'}</span></p>
-            <p className="text-sm text-gray-400">Sync runs automatically every 6 hours.</p>
+            <p className="text-sm text-gray-500">Sync runs automatically every 6 hours.</p>
           </div>
         </div>
 
         {/* Sync Progress Card */}
-        <div className="bg-gray-800 p-6 rounded-lg">
+        <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold">Sync Progress</h3>
             <button
@@ -182,9 +182,9 @@ export default function Page() {
               disabled={progressLoading}
               aria-label={progressLoading ? "Refreshing Sync Progress" : "Update Sync Progress"}
               aria-busy={progressLoading}
-              className={`inline-flex items-center px-3 py-1 text-sm rounded font-medium transition-colors ${progressLoading
-                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
+              className={`inline-flex items-center px-3 py-1 text-sm rounded-lg font-medium transition-colors ${progressLoading
+                ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                 }`}
             >
               {progressLoading && <Spinner />}
@@ -198,9 +198,9 @@ export default function Page() {
             ) : (
               <div className="space-y-3">
                 <p>Tracked Shows: <span className="font-mono text-lg text-green-400">{progressStatus.count?.toLocaleString() ?? '0'}</span></p>
-                <div className="max-h-56 overflow-auto border border-gray-700 rounded">
+                <div className="max-h-56 overflow-auto border border-[#333] rounded-lg">
                   <table className="w-full text-sm">
-                    <thead className="text-gray-400 border-b border-gray-700">
+                    <thead className="text-gray-500 border-b border-[#333]">
                       <tr>
                         <th className="p-2 text-left">AniList ID</th>
                         <th className="p-2 text-left">Last Abs</th>
@@ -214,7 +214,7 @@ export default function Page() {
                         </tr>
                       ) : (
                         (progressStatus.items || []).map((row) => (
-                          <tr key={row.anilistId} className="border-t border-gray-700">
+                          <tr key={row.anilistId} className="border-t border-[#333]">
                             <td className="p-2 font-mono">{row.anilistId}</td>
                             <td className="p-2 font-mono">{row.lastAbs}</td>
                             <td className="p-2 text-gray-300">{row.updatedAt ? formatTimestamp(row.updatedAt) : '-'}</td>

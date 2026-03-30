@@ -215,11 +215,11 @@ export default function SyncPage() {
             <div aria-live="polite" aria-atomic="true">
                 {result && (
                     result.error ? (
-                        <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded border border-red-800">
+                        <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-lg border border-red-800">
                             <strong>Error:</strong> {result.error}
                         </div>
                     ) : (
-                        <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded border border-green-800">
+                        <div className="mt-4 p-4 bg-green-900/50 text-green-200 rounded-lg border border-green-800">
                             <p className="font-medium mb-2">✓ Sync Successful</p>
                             {result.count !== undefined && <p>Episodes synced: <span className="font-mono">{result.count}</span></p>}
                             {result.synced !== undefined && <p>Episodes processed: <span className="font-mono">{result.synced}</span></p>}
@@ -247,9 +247,9 @@ export default function SyncPage() {
             <h2 className="text-2xl font-bold mb-6">Sync Shows</h2>
 
             {/* Manual Sync Section */}
-            <div className="bg-gray-800 p-6 rounded-lg mb-6">
+            <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none mb-6">
                 <h3 className="text-xl font-semibold mb-4">Sync Single Show</h3>
-                <p className="text-gray-400 mb-4 text-sm">
+                <p className="text-gray-500 mb-4 text-sm">
                     Sync a specific show by entering its AniList ID. This will fetch the show metadata and store episode mappings.
                 </p>
 
@@ -264,7 +264,7 @@ export default function SyncPage() {
                             value={manualId}
                             onChange={handleManualIdChange}
                             placeholder="Enter ID (e.g., 1) or full AniList URL"
-                            className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                            className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
                             onKeyPress={(e) => e.key === 'Enter' && syncShow()}
                             aria-describedby="manualId-hint"
                         />
@@ -272,16 +272,16 @@ export default function SyncPage() {
                             onClick={syncShow}
                             disabled={manualLoading}
                             aria-busy={manualLoading}
-                            className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${manualLoading
-                                ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${manualLoading
+                                ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                                : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                                 }`}
                         >
                             {manualLoading && <Spinner />}
                             {manualLoading ? 'Syncing...' : 'Sync Show'}
                         </button>
                     </div>
-                    <p id="manualId-hint" className="text-xs text-gray-400 mt-1">
+                    <p id="manualId-hint" className="text-xs text-gray-500 mt-1">
                         Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
                     </p>
                 </div>
@@ -290,13 +290,13 @@ export default function SyncPage() {
             </div>
 
             {/* Full Sync Section */}
-            <div className="bg-gray-800 p-6 rounded-lg mb-6">
+            <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none mb-6">
                 <h3 className="text-xl font-semibold mb-4">Full AniList Sync</h3>
-                <div className="bg-yellow-900/30 border border-yellow-800 p-3 rounded mb-4 text-sm">
+                <div className="bg-yellow-900/30 border border-yellow-800 p-3 rounded-lg mb-4 text-sm">
                     <p className="font-medium text-yellow-300 mb-1">⚠️ Important Setup</p>
                     <ol className="text-gray-300 list-decimal list-inside space-y-1">
                         <li>First, refresh the Fribbs database using the <strong>Dashboard</strong> page</li>
-                        <li>Ensure <code className="bg-gray-900 px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-gray-900 px-1">TRAKT_ACCESS_TOKEN</code> are set in Render</li>
+                        <li>Ensure <code className="bg-black px-1">ANILIST_ACCESS_TOKEN</code> and <code className="bg-black px-1">TRAKT_ACCESS_TOKEN</code> are set in Render</li>
                         <li>The system will automatically find Trakt IDs for your shows</li>
                     </ol>
                 </div>
@@ -305,9 +305,9 @@ export default function SyncPage() {
                     onClick={syncAll}
                     disabled={fullLoading}
                     aria-busy={fullLoading}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${fullLoading
-                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${fullLoading
+                        ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                        : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                         }`}
                 >
                     {fullLoading && <Spinner />}
@@ -321,9 +321,9 @@ export default function SyncPage() {
             </div>
 
             {/* Completed Sync Section */}
-            <div className="bg-gray-800 p-6 rounded-lg mb-6">
+            <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none mb-6">
                 <h3 className="text-xl font-semibold mb-4">Completed Sync</h3>
-                <p className="text-gray-400 mb-4 text-sm">
+                <p className="text-gray-500 mb-4 text-sm">
                     Sync all completed anime from AniList into Trakt. Uses AniList completed date if present; otherwise uses today.
                 </p>
 
@@ -331,9 +331,9 @@ export default function SyncPage() {
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
                     aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${completedLoading
-                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                        : 'bg-purple-600 hover:bg-purple-700 text-white'
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${completedLoading
+                        ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                        : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
                 >
                     {(completedLoading || (previewLoading && previewMode === 'completed')) && <Spinner />}
@@ -342,10 +342,10 @@ export default function SyncPage() {
 
                 <ResultDisplay result={completedResult} />
                 {previewLoading && previewMode === 'completed' && (
-                    <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
+                    <p className="text-xs text-gray-500 mt-2">Preparing list…</p>
                 )}
                 {completedLoading && (
-                    <p className="text-xs text-gray-400 mt-2">Sync in progress…</p>
+                    <p className="text-xs text-gray-500 mt-2">Sync in progress…</p>
                 )}
                 <p className="text-xs text-gray-500 mt-2">
                     Last completed sync: {syncStatus?.lastCompletedSync ? new Date(syncStatus.lastCompletedSync).toLocaleString() : 'Never'}
@@ -353,9 +353,9 @@ export default function SyncPage() {
             </div>
 
             {/* Watching Sync Section */}
-            <div className="bg-gray-800 p-6 rounded-lg mb-6">
+            <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none mb-6">
                 <h3 className="text-xl font-semibold mb-4">Watching Sync</h3>
-                <p className="text-gray-400 mb-4 text-sm">
+                <p className="text-gray-500 mb-4 text-sm">
                     Sync all currently watching anime from AniList into Trakt using today’s date.
                 </p>
 
@@ -363,9 +363,9 @@ export default function SyncPage() {
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
                     aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded font-medium transition-colors ${watchingLoading
-                        ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${watchingLoading
+                        ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                        : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
                 >
                     {(watchingLoading || (previewLoading && previewMode === 'watching')) && <Spinner />}
@@ -374,10 +374,10 @@ export default function SyncPage() {
 
                 <ResultDisplay result={watchingResult} />
                 {previewLoading && previewMode === 'watching' && (
-                    <p className="text-xs text-gray-400 mt-2">Preparing list…</p>
+                    <p className="text-xs text-gray-500 mt-2">Preparing list…</p>
                 )}
                 {watchingLoading && (
-                    <p className="text-xs text-gray-400 mt-2">Sync in progress…</p>
+                    <p className="text-xs text-gray-500 mt-2">Sync in progress…</p>
                 )}
                 <p className="text-xs text-gray-500 mt-2">
                     Last watching sync: {syncStatus?.lastWatchingSync ? new Date(syncStatus.lastWatchingSync).toLocaleString() : 'Never'}
@@ -390,7 +390,7 @@ export default function SyncPage() {
                     onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
                 >
                     <div
-                        className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl p-5"
+                        className="bg-black border border-[#333] rounded-lg-none w-full max-w-2xl p-5"
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="modal-title"
@@ -401,17 +401,17 @@ export default function SyncPage() {
                         </h4>
                         <div className="max-h-[400px] overflow-y-auto text-sm space-y-2">
                             {modalItems.length === 0 ? (
-                                <p className="text-gray-400">No items to sync.</p>
+                                <p className="text-gray-500">No items to sync.</p>
                             ) : (
                                 modalItems.map((item, idx) => (
-                                    <div key={idx} className="border-b border-gray-800 pb-2">
+                                    <div key={idx} className="border-b border-[#333] pb-2">
                                         <div className="font-medium">{item.titleEnglish}</div>
                                         {modalMode === 'completed' ? (
-                                            <div className="text-gray-400">
+                                            <div className="text-gray-500">
                                                 Watched at: {new Date(item.watchedAt).toLocaleString()}
                                             </div>
                                         ) : (
-                                            <div className="text-gray-400">
+                                            <div className="text-gray-500">
                                                 Episodes: {item.progress}{item.totalEpisodes ? ` / ${item.totalEpisodes}` : ''} • Date: {new Date(item.watchedAt).toLocaleDateString()}
                                             </div>
                                         )}
@@ -422,13 +422,13 @@ export default function SyncPage() {
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
-                                className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-gray-100"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={runSync}
-                                className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider"
                             >
                                 OK
                             </button>
@@ -438,17 +438,17 @@ export default function SyncPage() {
             )}
 
             {/* Info Section */}
-            <div className="bg-blue-900/20 border border-blue-800 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-300 mb-2">ℹ️ Setup Required</h4>
+            <div className="bg-[#111] border border-[#333] p-4 rounded-lg-none">
+                <h4 className="font-semibold text-red-500 mb-2">ℹ️ Setup Required</h4>
                 <p className="text-sm text-gray-300">
-                    To use full sync, you need to set up API tokens in your Render environment variables. See the <a href="https://github.com/Himanth-reddy/anilist-trakt-sync" className="text-blue-400 hover:underline">README</a> for setup instructions.
+                    To use full sync, you need to set up API tokens in your Render environment variables. See the <a href="https://github.com/Himanth-reddy/anilist-trakt-sync" className="text-red-500 hover:text-red-400 hover:underline">README</a> for setup instructions.
                 </p>
             </div>
 
             {/* Trakt Auth Section */}
-            <div className="bg-gray-800 p-6 rounded-lg mb-6">
+            <div className="bg-[#111] border border-[#333] p-6 rounded-lg-none mb-6">
                 <h3 className="text-xl font-semibold mb-4">Trakt Auth</h3>
-                <p className="text-gray-400 mb-4 text-sm">
+                <p className="text-gray-500 mb-4 text-sm">
                     Use this to re-authorize Trakt and update tokens in the database.
                 </p>
 
@@ -457,9 +457,9 @@ export default function SyncPage() {
                         onClick={getTraktAuthUrl}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded font-medium transition-colors ${authLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                            ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                            : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                             }`}
                     >
                         {authLoading && <Spinner />}
@@ -470,7 +470,7 @@ export default function SyncPage() {
                             href={authUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-4 py-2 rounded font-medium bg-gray-700 hover:bg-gray-600 text-white"
+                            className="px-4 py-2 rounded-lg font-medium bg-transparent hover:bg-gray-600 text-white"
                         >
                             Open Trakt Auth
                         </a>
@@ -484,15 +484,15 @@ export default function SyncPage() {
                         onChange={(e) => setAuthCode(e.target.value)}
                         placeholder="Paste Trakt auth code here"
                         aria-label="Trakt Auth Code"
-                        className="flex-1 px-4 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                        className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
                     />
                     <button
                         onClick={exchangeTraktCode}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded font-medium transition-colors ${authLoading
-                            ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                            ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                            : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                             }`}
                     >
                         {authLoading && <Spinner />}
