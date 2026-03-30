@@ -70,7 +70,7 @@ export default function Logs() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold">Logs</h2>
-        <div className="flex items-center gap-3 text-sm text-gray-400">
+        <div className="flex items-center gap-3 text-sm text-gray-500">
           {lastUpdated && (
             <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
           )}
@@ -79,9 +79,9 @@ export default function Logs() {
             disabled={isManualRefresh}
             aria-label={isManualRefresh ? "Refreshing logs" : "Refresh logs"}
             aria-busy={isManualRefresh}
-            className={`inline-flex items-center px-3 py-1 rounded transition-colors ${isManualRefresh
-                ? 'bg-gray-600 cursor-not-allowed text-gray-400'
-                : 'bg-gray-700 hover:bg-gray-600 text-gray-100'
+            className={`inline-flex items-center px-3 py-1 rounded-lg transition-colors ${isManualRefresh
+                ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+                : 'bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider'
               }`}
           >
             {isManualRefresh && <Spinner />}
@@ -92,7 +92,7 @@ export default function Logs() {
       {error ? (
         <div className="mb-3 text-red-400 text-sm">{error}</div>
       ) : null}
-      <div className="bg-gray-800 rounded-lg overflow-hidden">
+      <div className="bg-[#111] border border-[#333] rounded-lg-none overflow-hidden">
         <div className="max-h-[600px] overflow-y-auto p-4 space-y-2 font-mono text-sm">
           {loading && logs.length === 0 ? (
             <p className="text-gray-500 italic">Loading logs...</p>
@@ -114,7 +114,7 @@ export default function Logs() {
               const key = isObj ? (l.id ?? `${ts}-${msg}`) : `${i}-${msg}`;
 
               return (
-                <div key={key} className="border-b border-gray-700 pb-1 last:border-0">
+                <div key={key} className="border-b border-[#333] pb-1 last:border-0">
                   <span className="text-gray-500 mr-2">[{timeStr}]</span>
                   <span className={colorClass}>{msg.replace(/^\[.*?\]\s*/, '')}</span>
                 </div>

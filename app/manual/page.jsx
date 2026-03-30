@@ -40,7 +40,7 @@ export default function Manual() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Manual Mapping</h2>
-      <form onSubmit={submit} className="bg-gray-800 p-4 rounded space-y-3">
+      <form onSubmit={submit} className="bg-[#111] border border-[#333] p-4 rounded-lg space-y-3">
         {Object.keys(labels).map(f => {
           const isRequired = f === 'anilistId' || f === 'traktId';
           return (
@@ -56,7 +56,7 @@ export default function Manual() {
                 onChange={handle}
                 required={isRequired}
                 aria-required={isRequired}
-                className="w-full bg-gray-900 p-2 rounded border border-gray-700 focus:border-blue-500 focus:outline-none transition-colors"
+                className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:outline-none transition-colors"
               />
             </div>
           );
@@ -64,9 +64,9 @@ export default function Manual() {
         <button
           disabled={loading}
           aria-busy={loading}
-          className={`inline-flex items-center px-4 py-2 rounded font-medium transition-colors ${loading
-              ? 'bg-gray-600 cursor-not-allowed text-gray-300'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
+          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${loading
+              ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
+              : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
             }`}
         >
           {loading && <Spinner />}

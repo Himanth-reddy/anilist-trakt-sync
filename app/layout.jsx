@@ -1,25 +1,25 @@
 import './globals.css';
 
-import { Inter } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import React from 'react';
 
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
-const inter = Inter({ subsets: ["latin"] });
+const font = JetBrains_Mono({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
-  const linkClass = "hover:text-blue-400 rounded px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400";
+  const linkClass = "hover:text-red-500 rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors uppercase text-sm tracking-wider";
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${font.className} bg-black text-gray-200 antialiased`}>
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-gray-800 focus:text-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-br"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#111] focus:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded-br-none"
         >
           Skip to main content
         </a>
-        <nav className="bg-gray-800 p-4 flex justify-between items-center">
-          <h1 className="text-lg font-bold">AniList ↔ Trakt Sync</h1>
+        <nav className="bg-[#0a0a0a] border-b border-[#333] p-4 flex justify-between items-center">
+          <h1 className="text-lg font-bold text-white tracking-widest uppercase">AniList ↔ Trakt Sync</h1>
           <div className="space-x-4">
             <a href="/" className={linkClass}>Dashboard</a>
             <a href="/sync" className={linkClass}>Sync</a>

@@ -2,4 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+  background-color: black;
+  color: #d1d5db; /* gray-300 equivalent */
+}
+
+/* Specific Shonen UI adjustments */
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #dc2626; /* red-600 */
+  color: white;
+}
