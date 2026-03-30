@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const Spinner = () => (
   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -28,13 +29,13 @@ export default function MappingsPage() {
   useEffect(() => { fetchMappings(); }, []);
 
   const renderTable = (mappings, title) => (
-    <div className="mb-8">
+    <div className={`mb-8 transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-semibold">{title}</h3>
         <span className="text-gray-400">{mappings.length} entries</span>
       </div>
       <div className="overflow-auto">
-        <table className="w-full bg-gray-800 rounded-lg">
+        <table className="w-full bg-gray-800 rounded-lg" aria-busy={loading}>
           <thead>
             <tr className="text-left text-gray-400 border-b border-gray-700">
               <th scope="col" className="p-3">AniList ID</th>
@@ -48,7 +49,12 @@ export default function MappingsPage() {
             {mappings.length === 0 ? (
               <tr>
                 <td colSpan="5" className="p-4 text-center text-gray-500 italic">
-                  No mappings found
+                  No mappings found.{" "}
+                  {title === 'Manual Mappings' && (
+                    <Link href="/manual" className="text-blue-400 hover:underline not-italic ml-1">
+                      Add a mapping
+                    </Link>
+                  )}
                 </td>
               </tr>
             ) : (
