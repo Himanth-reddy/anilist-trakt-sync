@@ -8,6 +8,19 @@ const Spinner = () => (
   </svg>
 );
 
+/**
+ * Render the Mappings page with manual and automatic mapping tables and a refresh control.
+ *
+ * The component fetches mapping data from the `/api/mappings` endpoint on mount and when the
+ * user clicks the Refresh button. While loading, the UI reflects a busy state and the refresh
+ * control is disabled. On fetch failure the displayed mappings are reset to empty lists.
+ *
+ * Each table shows the number of entries and columns for AniList, Trakt, TMDB, IMDB, and TVDB.
+ * AniList IDs are always rendered as external links; other service IDs are rendered as external
+ * links when present or as `-` when absent.
+ *
+ * @returns {JSX.Element} The page's React element containing the mappings UI.
+ */
 export default function MappingsPage() {
   const [data, setData] = useState({ manual: [], auto: [] });
   const [loading, setLoading] = useState(false);
