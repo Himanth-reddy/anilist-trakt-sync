@@ -29,6 +29,18 @@ function formatTimestamp(value) {
   return parsed ? parsed.toLocaleString(undefined, DATE_TIME_FORMAT) : 'Unknown';
 }
 
+/**
+ * Render a live-updating logs view with manual refresh and error handling.
+ *
+ * The component fetches log entries from /api/logs, updates automatically every 5 seconds,
+ * and provides a manual "Refresh" control. It displays loading and error states, shows
+ * a "Last updated" timestamp when available, formats timestamps for each entry, and
+ * supports both object-shaped logs ({ message, created_at, level, id? }) and legacy
+ * string logs with a leading "[timestamp]" segment. Log lines are color-coded by level
+ * (`error`, `warn`, otherwise neutral).
+ *
+ * @returns {JSX.Element} The logs UI element.
+ */
 export default function Logs() {
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState('');

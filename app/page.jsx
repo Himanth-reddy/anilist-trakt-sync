@@ -29,6 +29,15 @@ function formatTimestamp(value) {
   return parsed ? parsed.toLocaleString(undefined, DATE_TIME_FORMAT) : 'Never';
 }
 
+/**
+ * Render the System Status dashboard displaying database and synchronization information.
+ *
+ * Shows four cards: Otaku Mappings DB, Fribbs Database, Sync Status, and Sync Progress.
+ * Each card presents counts and formatted timestamps, displays loading/error states, and
+ * includes actions to refresh the corresponding data where applicable.
+ *
+ * @returns {JSX.Element} The rendered dashboard component.
+ */
 export default function Page() {
   const [status, setStatus] = useState(null);
   const [otakuStatus, setOtakuStatus] = useState(null);

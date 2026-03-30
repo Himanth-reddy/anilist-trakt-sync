@@ -7,6 +7,13 @@ export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
 const font = JetBrains_Mono({ subsets: ["latin"] });
 
+/**
+ * Root layout component that renders the application's HTML scaffold with header navigation and a main content container.
+ *
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.children - Content to render inside the main element.
+ * @returns {JSX.Element} The top-level HTML element containing the skip link, header navigation, and the main element with id "main-content".
+ */
 export default function RootLayout({ children }) {
   const linkClass = "hover:text-red-500 rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors uppercase text-sm tracking-wider";
   return (
