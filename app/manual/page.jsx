@@ -2,6 +2,13 @@
 import React, { useState } from 'react';
 import Spinner from '../components/Spinner';
 
+/**
+ * Render a manual mapping form for submitting external IDs.
+ *
+ * The form includes inputs for AniList, Trakt, TMDB, IMDB, and TVDB IDs; AniList ID and Trakt ID are required.
+ *
+ * @returns {JSX.Element} A React element containing the manual mapping form with built-in loading and status handling.
+ */
 export default function Manual() {
   const [form, setForm] = useState({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
   const [status, setStatus] = useState('');

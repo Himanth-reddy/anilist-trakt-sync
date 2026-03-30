@@ -3,6 +3,18 @@ import React, { useEffect, useState } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
+/**
+ * Admin interface for running and previewing AniList-to-Trakt sync operations.
+ *
+ * Renders controls for syncing a single AniList show, performing full/`completed`/`watching` syncs
+ * (including preview and confirmation flows), shows sync status and results, and provides Trakt
+ * re-authorization/token exchange UI.
+ *
+ * The component manages local UI state for inputs, loading flags, preview modal contents, sync results,
+ * and Trakt auth flows, and calls the corresponding API endpoints under /api/*.
+ *
+ * @returns {JSX.Element} The SyncPage UI containing sync controls, result displays, preview/confirmation modal, and Trakt auth section.
+ */
 export default function SyncPage() {
     const [manualId, setManualId] = useState('');
     const [manualLoading, setManualLoading] = useState(false);
