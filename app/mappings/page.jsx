@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 const Spinner = () => (
   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -47,7 +48,7 @@ export default function MappingsPage() {
         <span className="text-gray-500">{mappings.length} entries</span>
       </div>
       <div className="overflow-auto">
-        <table className="w-full bg-[#111] border border-[#333] rounded-lg-none">
+        <table aria-busy={loading} className={`w-full bg-[#111] border border-[#333] rounded-lg-none transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
           <thead>
             <tr className="text-left text-gray-500 border-b border-[#333]">
               <th scope="col" className="p-3">AniList ID</th>
@@ -61,7 +62,7 @@ export default function MappingsPage() {
             {mappings.length === 0 ? (
               <tr>
                 <td colSpan="5" className="p-4 text-center text-gray-500 italic">
-                  No mappings found
+                  <span>No mappings found. <Link href="/manual" className="text-red-500 hover:text-red-400 hover:underline not-italic">Add manual mapping</Link></span>
                 </td>
               </tr>
             ) : (

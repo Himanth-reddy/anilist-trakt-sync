@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Spinner from './components/Spinner';
 
 const DATE_TIME_FORMAT = {
@@ -208,7 +209,7 @@ export default function Page() {
               <div className="space-y-3">
                 <p>Tracked Shows: <span className="font-mono text-lg text-green-400">{progressStatus.count?.toLocaleString() ?? '0'}</span></p>
                 <div className="max-h-56 overflow-auto border border-[#333] rounded-lg">
-                  <table className="w-full text-sm">
+                  <table aria-busy={progressLoading} className={`w-full text-sm transition-opacity duration-200 ${progressLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                     <thead className="text-gray-500 border-b border-[#333]">
                       <tr>
                         <th className="p-2 text-left">AniList ID</th>
@@ -219,7 +220,9 @@ export default function Page() {
                     <tbody>
                       {(progressStatus.items || []).length === 0 ? (
                         <tr>
-                          <td colSpan="3" className="p-3 text-gray-500 italic text-center">No progress rows yet</td>
+                          <td colSpan="3" className="p-3 text-gray-500 italic text-center">
+                            <span>No progress rows yet. <Link href="/sync" className="text-red-500 hover:text-red-400 hover:underline not-italic">Sync a show</Link></span>
+                          </td>
                         </tr>
                       ) : (
                         (progressStatus.items || []).map((row) => (
