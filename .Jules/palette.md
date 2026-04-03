@@ -15,3 +15,7 @@
 ## 2025-03-09 - Empty states and async data tables
 **Learning:** Tables displaying dynamic data can feel like "dead ends" when empty, confusing users about what to do next. Furthermore, during async fetch operations (like refreshing or loading tables), relying solely on a small button spinner leaves the primary content area looking active and fully interactive, which can lead to confusion or double-clicking.
 **Action:** For empty states in data tables, always provide an inline Call-to-Action (CTA) link to the relevant creation or sync flow to guide the user naturally. During async operations that update a table's contents, apply visual dimming (`opacity-50 pointer-events-none`) and set `aria-busy="true"` on the table element to provide clear state feedback and prevent extraneous interaction.
+
+## 2025-04-03 - Client-side routing with standard anchors
+**Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
+**Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
