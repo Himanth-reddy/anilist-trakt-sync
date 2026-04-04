@@ -2,6 +2,7 @@ import './globals.css';
 
 import { JetBrains_Mono } from "next/font/google";
 import React from 'react';
+import Link from 'next/link';
 
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
@@ -28,11 +29,11 @@ export default function RootLayout({ children }) {
         <nav className="bg-[#0a0a0a] border-b border-[#333] p-4 flex justify-between items-center">
           <h1 className="text-lg font-bold text-white tracking-widest uppercase">AniList ↔ Trakt Sync</h1>
           <div className="space-x-4">
-            <a href="/" className={linkClass}>Dashboard</a>
-            <a href="/sync" className={linkClass}>Sync</a>
-            <a href="/mappings" className={linkClass}>Mappings</a>
-            <a href="/manual" className={linkClass}>Manual Map</a>
-            <a href="/logs" className={linkClass}>Logs</a>
+            <Link href="/" className={linkClass}>Dashboard</Link>
+            <Link href="/sync" className={linkClass}>Sync</Link>
+            <Link href="/mappings" className={linkClass}>Mappings</Link>
+            <Link href="/manual" className={linkClass}>Manual Map</Link>
+            <Link href="/logs" className={linkClass}>Logs</Link>
           </div>
         </nav>
         <main id="main-content" className="p-6 max-w-5xl mx-auto" tabIndex="-1">{children}</main>
