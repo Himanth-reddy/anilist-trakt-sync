@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Spinner from '../components/Spinner';
+import { extractAnilistId } from '../../lib/url-utils';
 
 /**
  * Render a manual mapping form for submitting external IDs.
@@ -22,7 +23,20 @@ export default function Manual() {
     tvdbId: 'TVDB ID'
   };
 
-  const handle = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const anilistRef = useRef(null);
+
+  const handle = e => {
+    const { name, value } = e.target;
+    let finalValue = value;
+    if (name === 'anilistId') {
+      const extracted = extractAnilistId(value);
+      // Wait to set finalValue if extracted exists and the string was a URL
+      if (extracted) {
+        finalValue = extracted;
+      }
+    }
+    setForm({ ...form, [name]: finalValue });
+  };
 
   const submit = async e => {
     e.preventDefault();
@@ -36,12 +50,26 @@ export default function Manual() {
         body: JSON.stringify(form)
       });
       const j = await res.json();
-      setStatus(j.success ? 'Saved ✅' : ('Failed: ' + (j.error || 'unknown')));
+      if (j.success) {
+        setStatus('Saved ✅');
+        setForm({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
+        anilistRef.current?.focus();
+      } else {
+        setStatus('Failed: ' + (j.error || 'unknown'));
+      }
     } catch (err) {
       setStatus('Failed: ' + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const placeholders = {
+    anilistId: 'e.g. 101280 or full URL',
+    traktId: 'e.g. 12345',
+    tmdbId: 'Optional',
+    imdbId: 'Optional',
+    tvdbId: 'Optional'
   };
 
   return (
@@ -63,7 +91,9 @@ export default function Manual() {
                 onChange={handle}
                 required={isRequired}
                 aria-required={isRequired}
-                className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:outline-none transition-colors"
+                placeholder={placeholders[f]}
+                ref={f === 'anilistId' ? anilistRef : null}
+                className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-colors placeholder-gray-600"
               />
             </div>
           );
