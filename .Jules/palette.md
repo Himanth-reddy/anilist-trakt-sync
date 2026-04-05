@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-04-05 - Continuous data entry loop feedback
+**Learning:** In forms designed for rapid, repetitive data entry (like manual ID mapping), simply showing a success message is insufficient and breaks the user's flow. Users must manually delete old values and re-focus the input, causing friction.
+**Action:** For repetitive data entry forms, always clear the form state on successful submission and programmatically return focus to the first input field. Combine this with auto-formatting on paste (e.g., URL extraction) to drastically reduce interaction cost.
