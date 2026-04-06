@@ -3,7 +3,6 @@ import './globals.css';
 import { JetBrains_Mono } from "next/font/google";
 import Link from 'next/link';
 import React from 'react';
-import Link from 'next/link';
 
 export const metadata = { title: 'AniList ↔ Trakt Sync' };
 
