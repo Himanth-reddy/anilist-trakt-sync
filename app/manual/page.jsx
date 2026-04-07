@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Spinner from '../components/Spinner';
+import { extractAnilistId } from '../../lib/url-utils';
 
 /**
  * Render a manual mapping form for submitting external IDs.
@@ -13,6 +14,7 @@ export default function Manual() {
   const [form, setForm] = useState({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const firstInputRef = useRef(null);
 
   const labels = {
     anilistId: 'AniList ID',
@@ -22,7 +24,15 @@ export default function Manual() {
     tvdbId: 'TVDB ID'
   };
 
-  const handle = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handle = e => {
+    const { name, value } = e.target;
+    if (name === 'anilistId') {
+      const extracted = extractAnilistId(value);
+      setForm({ ...form, [name]: extracted || value });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const submit = async e => {
     e.preventDefault();
@@ -36,7 +46,13 @@ export default function Manual() {
         body: JSON.stringify(form)
       });
       const j = await res.json();
-      setStatus(j.success ? 'Saved ✅' : ('Failed: ' + (j.error || 'unknown')));
+      if (j.success) {
+        setStatus('Saved ✅');
+        setForm({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
+        firstInputRef.current?.focus();
+      } else {
+        setStatus('Failed: ' + (j.error || 'unknown'));
+      }
     } catch (err) {
       setStatus('Failed: ' + err.message);
     } finally {
@@ -63,8 +79,15 @@ export default function Manual() {
                 onChange={handle}
                 required={isRequired}
                 aria-required={isRequired}
+                ref={f === 'anilistId' ? firstInputRef : null}
                 className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:outline-none transition-colors"
+                aria-describedby={f === 'anilistId' ? 'anilistId-hint' : null}
               />
+              {f === 'anilistId' && (
+                <p id="anilistId-hint" className="text-xs text-gray-500 mt-1">
+                  Tip: You can paste a full AniList URL (e.g., <code>https://anilist.co/anime/1/...</code>) to auto-extract the ID.
+                </p>
+              )}
             </div>
           );
         })}
