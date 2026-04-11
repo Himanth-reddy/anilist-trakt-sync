@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-04-11 - Active navigation states and aria-current
+**Learning:** Hardcoded links in Next.js layouts lack dynamic active states, making it hard for users (especially screen reader users) to know which page they are currently on.
+**Action:** Extract navigation logic into a dedicated client component (e.g., `NavLinks.jsx`) using `usePathname()` from `next/navigation`. Apply dynamic active styles and strictly use `aria-current="page"` to explicitly indicate the current route to screen readers, while keeping the main layout as a Server Component.
