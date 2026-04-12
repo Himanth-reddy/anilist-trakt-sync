@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-04-12 - Reusing modal close functions
+**Learning:** For accessibility, custom modals using `role="dialog"` must have multiple dismissal mechanisms (Escape key and clicking outside/on the backdrop/on cancel buttons). Repeating the same state-clearing inline functions across all these handlers introduces unnecessary duplication.
+**Action:** Always extract the modal close logic into a separate `closeModal` function. Then bind this single function to `useEffect` keydown listeners, the backdrop `onClick`, and the explicit 'Cancel' button `onClick` handlers.

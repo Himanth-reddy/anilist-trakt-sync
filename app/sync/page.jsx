@@ -45,12 +45,16 @@ export default function SyncPage() {
             .catch(() => { });
     }, []);
 
+    const closeModal = () => {
+        setModalOpen(false);
+        setModalItems([]);
+        setModalMode(null);
+    };
+
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && modalOpen) {
-                setModalOpen(false);
-                setModalItems([]);
-                setModalMode(null);
+                closeModal();
             }
         };
 
@@ -150,9 +154,7 @@ export default function SyncPage() {
             setWatchingResult(null);
         }
 
-        setModalOpen(false);
-        setModalItems([]);
-        setModalMode(null);
+        closeModal();
 
         try {
             const res = await fetch(endpoint, { method: 'POST' });
@@ -399,7 +401,7 @@ export default function SyncPage() {
             {modalOpen && (
                 <div
                     className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
-                    onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
+                    onClick={closeModal}
                 >
                     <div
                         className="bg-black border border-[#333] rounded-lg-none w-full max-w-2xl p-5"
@@ -433,7 +435,7 @@ export default function SyncPage() {
                         </div>
                         <div className="flex justify-end gap-2 mt-4">
                             <button
-                                onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
+                                onClick={closeModal}
                                 className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider"
                             >
                                 Cancel
