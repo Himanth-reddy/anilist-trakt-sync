@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-04-25 - Active states and aria-current for navigation
+**Learning:** In Next.js App Router applications, keeping `RootLayout` as a server component means you cannot use `usePathname()` to determine the active route directly within the layout. If links lack dynamic styling or `aria-current="page"`, keyboard and screen reader users lose context about their current location within the app, and visual users lack an indicator of the active page.
+**Action:** Extract navigation logic into a dedicated client component (e.g., `NavLinks`) that uses `usePathname()`. Apply `aria-current="page"` and a distinct visual style (e.g., bold text and an active color) to the link that matches the current pathname, then import this component back into the server-rendered `RootLayout`.
