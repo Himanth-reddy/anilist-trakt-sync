@@ -149,7 +149,7 @@ export default function MappingsPage() {
           disabled={loading}
           aria-label={loading ? "Refreshing mappings..." : "Refresh mappings"}
           aria-busy={loading}
-          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${loading
+          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${loading
               ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
               : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
             }`}
