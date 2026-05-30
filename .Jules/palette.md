@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-05-18 - Formless inputs and visual feedback
+**Learning:** For standalone or "formless" inputs (where a submit button triggers an API request without a native `<form>`), relying solely on error toasts or alerts when users submit empty input is a poor experience. It allows interaction that predictably fails. Additionally, standard inputs missing a visually hidden `<label>` cause screen readers to announce only the placeholder, missing critical context.
+**Action:** When implementing formless inputs, explicitly disable the associated submit/action button when the input is empty or invalid. Provide a `title` attribute on the button to explain the disabled state (e.g., "Please enter an ID to sync"). Ensure every input has a properly linked `<label>` (using `htmlFor`), even if it is visually hidden (`.sr-only`), to provide clear context for assistive technologies. Also ensure keyboard handlers verify non-empty states (e.g., `e.key === 'Enter' && input.trim()`).
