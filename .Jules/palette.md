@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-05-15 - Formless inputs and onKeyDown
+**Learning:** Using `onKeyPress` for keyboard events is deprecated and can cause issues. Additionally, allowing formless inputs to be submitted when empty (either via the "Enter" key or by clicking the associated action button) creates confusing, non-actionable states. Furthermore, disabling the action button without explaining *why* leaves users guessing.
+**Action:** In React, always use `onKeyDown` instead of `onKeyPress`. Ensure the handler verifies the input has content (e.g., `e.key === 'Enter' && input.trim() && action()`). When explicitly disabling the action button due to an empty input, add a `title` attribute to provide a helpful tooltip (e.g., `title="Please enter a value"`) explaining the disabled state.
