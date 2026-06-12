@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-06-12 - Empty input submission prevention and tooltips
+**Learning:** For actions like manual syncing or auth code exchanges, forms or standalone inputs lacking visual feedback on their constraints can lead to silent failure experiences. A user might hit 'Enter' or click 'Sync Show' on an empty input, doing nothing and causing confusion.
+**Action:** Always prevent submission by trimming string constraints (e.g. `!input.trim()`), disable the submission buttons explicitly under these conditions, and utilize `title` tooltips on disabled buttons to offer inline rationale (e.g. `title="Please enter a Trakt auth code"`). Additionally, use `onKeyDown` instead of deprecated `onKeyPress` to monitor keyboard commands.
