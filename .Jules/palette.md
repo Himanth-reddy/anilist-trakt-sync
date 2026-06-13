@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-05-18 - Missing labels on design-omitted inputs
+**Learning:** When visual designs intentionally omit explicit field labels (relying only on placeholders for inputs), the input loses crucial context for screen reader users if standard attributes (like `aria-label`) are missed or insufficient.
+**Action:** When a design requires a label-less input (like a quick "paste code" field), always include a structurally complete but visually hidden label using `<label htmlFor="inputId" className="sr-only">Label Text</label>` paired with the exact `id` on the input element. This provides robust structural semantics without impacting the intended visual design.
