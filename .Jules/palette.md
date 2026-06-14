@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-06-14 - Empty State Disabled Buttons and Keyboard Submissions
+**Learning:** For standalone input fields paired with a submission button (e.g., search or sync fields), users expect to hit 'Enter' to submit. If this is implemented manually (`onKeyDown`), the handler must explicitly check that the input is not empty (e.g., via `.trim()`) to prevent firing API requests with empty values. Concurrently, to provide clear feedback and adhere to accessibility guidelines, the paired submission button should be explicitly disabled when the input is empty and include a helpful `title` explaining why it's disabled.
+**Action:** When implementing standalone input-button pairs, always use `onKeyDown` instead of the deprecated `onKeyPress`, enforce `.trim()` checks inside the keyboard handler before calling the action, and dynamically bind `disabled` and `title` attributes on the button to the input's current value.
