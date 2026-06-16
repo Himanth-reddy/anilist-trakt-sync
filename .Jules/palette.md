@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2026-06-16 - Add comprehensive disabled states for empty form inputs
+**Learning:** When inputs lack traditional forms, empty submissions can silently fail or cause confusing UI states. Using `disabled={!input.trim()}` paired with a `title` attribute for tooltips provides a clear, accessible constraint without requiring extensive validation feedback.
+**Action:** When implementing standalone inputs with adjacent submit buttons, ensure the button is explicitly disabled if the input is empty or whitespace-only, and explain the disabled state via tooltips.
