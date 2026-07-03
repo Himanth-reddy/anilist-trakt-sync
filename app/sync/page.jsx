@@ -277,12 +277,13 @@ export default function SyncPage() {
                             onChange={handleManualIdChange}
                             placeholder="Enter ID (e.g., 1) or full AniList URL"
                             className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
-                            onKeyPress={(e) => e.key === 'Enter' && syncShow()}
+                            onKeyDown={(e) => e.key === 'Enter' && manualId.trim() && syncShow()}
                             aria-describedby="manualId-hint"
                         />
                         <button
                             onClick={syncShow}
-                            disabled={manualLoading}
+                            disabled={manualLoading || !manualId.trim()}
+                            title={!manualId.trim() ? 'Please enter an AniList ID or URL' : undefined}
                             aria-busy={manualLoading}
                             className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${manualLoading
                                 ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
