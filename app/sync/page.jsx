@@ -276,15 +276,16 @@ export default function SyncPage() {
                             value={manualId}
                             onChange={handleManualIdChange}
                             placeholder="Enter ID (e.g., 1) or full AniList URL"
-                            className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
-                            onKeyPress={(e) => e.key === 'Enter' && syncShow()}
+                            className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                            onKeyDown={(e) => e.key === 'Enter' && manualId.trim() && syncShow()}
                             aria-describedby="manualId-hint"
                         />
                         <button
                             onClick={syncShow}
-                            disabled={manualLoading}
+                            disabled={manualLoading || !manualId.trim()}
                             aria-busy={manualLoading}
-                            className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${manualLoading
+                            title={!manualId.trim() ? "Please enter an AniList ID or URL first" : ""}
+                            className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${(manualLoading || !manualId.trim())
                                 ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                                 : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                                 }`}
@@ -490,19 +491,23 @@ export default function SyncPage() {
                 </div>
 
                 <div className="flex gap-3 mb-2">
+                    <label htmlFor="authCode" className="sr-only">Trakt Auth Code</label>
                     <input
+                        id="authCode"
                         type="text"
                         value={authCode}
                         onChange={(e) => setAuthCode(e.target.value)}
                         placeholder="Paste Trakt auth code here"
                         aria-label="Trakt Auth Code"
-                        className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
+                        onKeyDown={(e) => e.key === 'Enter' && authCode.trim() && exchangeTraktCode()}
+                        className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                     />
                     <button
                         onClick={exchangeTraktCode}
-                        disabled={authLoading}
+                        disabled={authLoading || !authCode.trim()}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                        title={!authCode.trim() ? "Please paste a Trakt auth code first" : ""}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${(authLoading || !authCode.trim())
                             ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                             : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                             }`}
