@@ -494,15 +494,17 @@ export default function SyncPage() {
                         type="text"
                         value={authCode}
                         onChange={(e) => setAuthCode(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && authCode.trim() && exchangeTraktCode()}
                         placeholder="Paste Trakt auth code here"
                         aria-label="Trakt Auth Code"
-                        className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus:border-red-500 focus:outline-none"
+                        className="flex-1 px-4 py-2 bg-transparent rounded-lg border border-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors"
                     />
                     <button
                         onClick={exchangeTraktCode}
-                        disabled={authLoading}
+                        disabled={authLoading || !authCode.trim()}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                        title={!authCode.trim() ? "Please enter an auth code to save" : ""}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading || !authCode.trim()
                             ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                             : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                             }`}
