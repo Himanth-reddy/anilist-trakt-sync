@@ -89,7 +89,7 @@ export default function Manual() {
                 aria-required={isRequired}
                 placeholder={placeholders[f]}
                 ref={f === 'anilistId' ? firstInputRef : null}
-                className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:outline-none transition-colors"
+                className="w-full bg-black p-2 rounded-lg border border-[#333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus:border-red-500 transition-colors"
                 aria-describedby={f === 'anilistId' ? 'anilistId-hint' : null}
               />
               {f === 'anilistId' && (
@@ -103,7 +103,7 @@ export default function Manual() {
         <button
           disabled={loading}
           aria-busy={loading}
-          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${loading
+          className={`inline-flex items-center px-4 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${loading
               ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
               : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
             }`}
