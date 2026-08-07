@@ -24,6 +24,14 @@ export default function Manual() {
     tvdbId: 'TVDB ID'
   };
 
+  const placeholders = {
+    anilistId: 'e.g. 1 or full URL',
+    traktId: 'e.g. 12345',
+    tmdbId: 'e.g. 12345',
+    imdbId: 'e.g. tt1234567',
+    tvdbId: 'e.g. 12345'
+  };
+
   const handle = e => {
     const { name, value } = e.target;
     if (name === 'anilistId') {
@@ -79,6 +87,7 @@ export default function Manual() {
                 onChange={handle}
                 required={isRequired}
                 aria-required={isRequired}
+                placeholder={placeholders[f]}
                 ref={f === 'anilistId' ? firstInputRef : null}
                 className="w-full bg-black p-2 rounded-lg border border-[#333] focus:border-red-500 focus:outline-none transition-colors"
                 aria-describedby={f === 'anilistId' ? 'anilistId-hint' : null}
