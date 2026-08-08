@@ -446,13 +446,13 @@ export default function SyncPage() {
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
-                                className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={runSync}
-                                className="px-3 py-1 rounded-lg bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                             >
                                 OK
                             </button>
