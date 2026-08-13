@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
@@ -37,6 +37,13 @@ export default function SyncPage() {
     const [authCode, setAuthCode] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
     const [authResult, setAuthResult] = useState(null);
+    const modalTitleRef = useRef(null);
+
+    useEffect(() => {
+        if (modalOpen && modalTitleRef.current) {
+            modalTitleRef.current.focus();
+        }
+    }, [modalOpen]);
 
     useEffect(() => {
         fetch('/api/status', { cache: 'no-store' })
@@ -318,7 +325,7 @@ export default function SyncPage() {
                     onClick={syncAll}
                     disabled={fullLoading}
                     aria-busy={fullLoading}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${fullLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${fullLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -344,7 +351,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
                     aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${completedLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${completedLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -376,7 +383,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
                     aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${watchingLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${watchingLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -410,7 +417,7 @@ export default function SyncPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <h4 id="modal-title" className="text-lg font-semibold">
+                            <h4 id="modal-title" className="text-lg font-semibold" tabIndex="-1" ref={modalTitleRef}>
                                 {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                             </h4>
                             <button
@@ -446,13 +453,13 @@ export default function SyncPage() {
                         <div className="flex justify-end gap-2 mt-4">
                             <button
                                 onClick={() => { setModalOpen(false); setModalItems([]); setModalMode(null); }}
-                                className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={runSync}
-                                className="px-3 py-1 rounded-lg bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider"
+                                className="px-3 py-1 rounded-lg bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                             >
                                 OK
                             </button>
@@ -481,7 +488,7 @@ export default function SyncPage() {
                         onClick={getTraktAuthUrl}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 transition-colors ${authLoading
                             ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                             : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                             }`}
@@ -494,7 +501,7 @@ export default function SyncPage() {
                             href={authUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-4 py-2 rounded-lg font-medium bg-transparent hover:bg-gray-600 text-white"
+                            className="px-4 py-2 rounded-lg font-medium bg-transparent hover:bg-gray-600 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             Open Trakt Auth
                         </a>
