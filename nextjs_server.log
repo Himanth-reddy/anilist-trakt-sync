@@ -1,0 +1,26 @@
+
+> anilist-trakt-sync@ dev /app
+> next dev
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+✓ Ready in 702ms
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+○ Compiling /sync ...
+ GET /sync 200 in 4.3s (compile: 3.7s, render: 566ms)
+ GET /api/status 200 in 919ms (compile: 890ms, render: 28ms)
+○ Compiling /api/completed-sync ...
+[Anilist] HTTP error fetching user ID: 400 Bad Request
+ GET /api/completed-sync?preview=1 200 in 6.6s (compile: 6.4s, render: 196ms)
+ ELIFECYCLE  Command failed.
+[?25h
