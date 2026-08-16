@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
@@ -37,6 +37,13 @@ export default function SyncPage() {
     const [authCode, setAuthCode] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
     const [authResult, setAuthResult] = useState(null);
+    const modalTitleRef = useRef(null);
+
+    useEffect(() => {
+        if (modalOpen && modalTitleRef.current) {
+            modalTitleRef.current.focus();
+        }
+    }, [modalOpen]);
 
     useEffect(() => {
         fetch('/api/status', { cache: 'no-store' })
@@ -410,7 +417,7 @@ export default function SyncPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <h4 id="modal-title" className="text-lg font-semibold">
+                            <h4 id="modal-title" ref={modalTitleRef} tabIndex="-1" className="text-lg font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded p-1">
                                 {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                             </h4>
                             <button
