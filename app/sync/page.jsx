@@ -31,6 +31,7 @@ export default function SyncPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState(null);
     const [modalItems, setModalItems] = useState([]);
+    const modalTitleRef = React.useRef(null);
     const [previewLoading, setPreviewLoading] = useState(false);
     const [previewMode, setPreviewMode] = useState(null);
     const [authUrl, setAuthUrl] = useState('');
@@ -56,6 +57,10 @@ export default function SyncPage() {
 
         if (modalOpen) {
             window.addEventListener('keydown', handleKeyDown);
+            // Using setTimeout to ensure the element is rendered in DOM before focusing
+            setTimeout(() => {
+                modalTitleRef.current?.focus();
+            }, 0);
         }
 
         return () => window.removeEventListener('keydown', handleKeyDown);
@@ -410,7 +415,7 @@ export default function SyncPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <h4 id="modal-title" className="text-lg font-semibold">
+                            <h4 id="modal-title" className="text-lg font-semibold" ref={modalTitleRef} tabIndex="-1">
                                 {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                             </h4>
                             <button
