@@ -19,3 +19,7 @@
 ## 2025-04-03 - Client-side routing with standard anchors
 **Learning:** Using standard HTML `<a>` tags for internal navigation in Next.js triggers full-page reloads. This breaks the seamless SPA experience, makes navigation feel slow, and discards application state.
 **Action:** Always use the Next.js `<Link>` component for internal navigation routes (e.g., in headers and inline CTAs) to preserve client-side routing and provide a smoother, faster user experience.
+
+## 2025-05-18 - Modal initial focus management and focus rings
+**Learning:** For screen readers, it is critical to shift focus into a modal when it opens; pointing focus directly to the modal title (using a ref, `tabIndex="-1"`, and a timeout to ensure rendering) elegantly provides context to assistive tech. However, default browser styles will often paint a heavy visual focus ring around non-interactive elements (like `<h4>`) when they receive programmatic focus, which can appear broken or confusing to sighted users.
+**Action:** When applying programmatic focus to non-interactive elements (like a modal title) for screen reader accessibility, ensure you include CSS utility classes (e.g. Tailwind's `focus:outline-none`) on the element to suppress the default visual focus ring, so the experience is robust for assistive tech without compromising visual polish.
