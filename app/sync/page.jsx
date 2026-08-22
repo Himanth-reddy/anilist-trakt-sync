@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
@@ -28,6 +28,8 @@ export default function SyncPage() {
     const [watchingResult, setWatchingResult] = useState(null);
     const [syncStatus, setSyncStatus] = useState(null);
 
+    const modalTitleRef = useRef(null);
+
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState(null);
     const [modalItems, setModalItems] = useState([]);
@@ -44,6 +46,14 @@ export default function SyncPage() {
             .then(setSyncStatus)
             .catch(() => { });
     }, []);
+
+    useEffect(() => {
+        if (modalOpen && modalTitleRef.current) {
+            setTimeout(() => {
+                modalTitleRef.current?.focus();
+            }, 0);
+        }
+    }, [modalOpen]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -410,7 +420,7 @@ export default function SyncPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <h4 id="modal-title" className="text-lg font-semibold">
+                            <h4 id="modal-title" ref={modalTitleRef} tabIndex="-1" className="text-lg font-semibold focus:outline-none">
                                 {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                             </h4>
                             <button
