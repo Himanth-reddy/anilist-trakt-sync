@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: anilist-trakt-sync
+    env: node
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
