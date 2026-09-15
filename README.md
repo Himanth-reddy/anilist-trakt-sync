@@ -78,20 +78,20 @@ Optional:
 
 1. Install dependencies:
 ```bash
-pnpm install
+npm install
 ```
 2. Add `.env` with required variables.
 3. Start dev server:
 ```bash
-pnpm run dev
+npm run dev
 ```
 4. Run tests:
 ```bash
-pnpm test
+npm test
 ```
 5. Build production bundle:
 ```bash
-pnpm run build
+npm run build
 ```
 
 ## Scheduling

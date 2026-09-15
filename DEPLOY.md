@@ -58,8 +58,8 @@ Verify:
 Create a new Web Service manually.
 
 Settings:
-- Build Command: `pnpm install && pnpm run build`
-- Start Command: `pnpm start`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
 - Environment Variables:
   - `NODE_VERSION`: `20.0.0`
   - Plus all required variables listed in Section 2.
