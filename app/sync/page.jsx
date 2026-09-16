@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { extractAnilistId } from '../../lib/url-utils';
 import Spinner from '../components/Spinner';
 
@@ -16,6 +16,7 @@ import Spinner from '../components/Spinner';
  * @returns {JSX.Element} The SyncPage UI containing sync controls, result displays, preview/confirmation modal, and Trakt auth section.
  */
 export default function SyncPage() {
+    const modalTitleRef = useRef(null);
     const [manualId, setManualId] = useState('');
     const [manualLoading, setManualLoading] = useState(false);
     const [manualResult, setManualResult] = useState(null);
@@ -56,6 +57,9 @@ export default function SyncPage() {
 
         if (modalOpen) {
             window.addEventListener('keydown', handleKeyDown);
+            setTimeout(() => {
+                modalTitleRef.current?.focus();
+            }, 0);
         }
 
         return () => window.removeEventListener('keydown', handleKeyDown);
@@ -410,7 +414,7 @@ export default function SyncPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-3">
-                            <h4 id="modal-title" className="text-lg font-semibold">
+                            <h4 id="modal-title" ref={modalTitleRef} tabIndex="-1" className="text-lg font-semibold focus:outline-none">
                                 {modalMode === 'completed' ? 'Confirm Completed Sync' : 'Confirm Watching Sync'}
                             </h4>
                             <button
