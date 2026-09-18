@@ -322,7 +322,7 @@ export default function SyncPage() {
                     onClick={syncAll}
                     disabled={fullLoading}
                     aria-busy={fullLoading}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${fullLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${fullLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-green-600 text-green-500 hover:bg-green-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -348,7 +348,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('completed')}
                     disabled={completedLoading || previewLoading}
                     aria-busy={completedLoading || (previewLoading && previewMode === 'completed')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${completedLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${completedLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -380,7 +380,7 @@ export default function SyncPage() {
                     onClick={() => openPreview('watching')}
                     disabled={watchingLoading || previewLoading}
                     aria-busy={watchingLoading || (previewLoading && previewMode === 'watching')}
-                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${watchingLoading
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${watchingLoading
                         ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                         : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                         }`}
@@ -485,7 +485,7 @@ export default function SyncPage() {
                         onClick={getTraktAuthUrl}
                         disabled={authLoading}
                         aria-busy={authLoading}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${authLoading
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${authLoading
                             ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                             : 'bg-transparent border border-red-600 text-red-500 hover:bg-red-600 hover:text-white uppercase tracking-wider'
                             }`}
@@ -498,7 +498,7 @@ export default function SyncPage() {
                             href={authUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-4 py-2 rounded-lg font-medium bg-transparent hover:bg-gray-600 text-white"
+                            className="px-4 py-2 rounded-lg font-medium bg-transparent hover:bg-gray-600 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         >
                             Open Trakt Auth
                         </a>

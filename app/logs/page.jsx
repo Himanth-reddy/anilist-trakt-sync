@@ -91,7 +91,7 @@ export default function Logs() {
             disabled={isManualRefresh}
             aria-label={isManualRefresh ? "Refreshing logs" : "Refresh logs"}
             aria-busy={isManualRefresh}
-            className={`inline-flex items-center px-3 py-1 rounded-lg transition-colors ${isManualRefresh
+            className={`inline-flex items-center px-3 py-1 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 ${isManualRefresh
                 ? 'bg-transparent border border-[#333] cursor-not-allowed text-gray-600 uppercase tracking-wider'
                 : 'bg-transparent border border-gray-600 text-gray-500 hover:bg-gray-600 hover:text-white uppercase tracking-wider'
               }`}
