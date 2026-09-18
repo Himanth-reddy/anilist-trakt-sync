@@ -12,7 +12,7 @@ import { extractAnilistId } from '../../lib/url-utils';
  */
 export default function Manual() {
   const [form, setForm] = useState({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const firstInputRef = useRef(null);
 
@@ -45,7 +45,7 @@ export default function Manual() {
   const submit = async e => {
     e.preventDefault();
     if (loading) return;
-    setStatus('Saving...');
+    setStatus({ type: 'loading', message: 'Saving...' });
     setLoading(true);
     try {
       const res = await fetch('/api/manual-map', {
@@ -55,14 +55,14 @@ export default function Manual() {
       });
       const j = await res.json();
       if (j.success) {
-        setStatus('Saved ✅');
+        setStatus({ type: 'success', message: 'Saved ✅' });
         setForm({ anilistId: '', traktId: '', tmdbId: '', imdbId: '', tvdbId: '' });
         firstInputRef.current?.focus();
       } else {
-        setStatus('Failed: ' + (j.error || 'unknown'));
+        setStatus({ type: 'error', message: 'Failed: ' + (j.error || 'unknown') });
       }
     } catch (err) {
-      setStatus('Failed: ' + err.message);
+      setStatus({ type: 'error', message: 'Failed: ' + err.message });
     } finally {
       setLoading(false);
     }
@@ -86,10 +86,11 @@ export default function Manual() {
                 value={form[f]}
                 onChange={handle}
                 required={isRequired}
+                disabled={loading}
                 aria-required={isRequired}
                 placeholder={placeholders[f]}
                 ref={f === 'anilistId' ? firstInputRef : null}
-                className="w-full bg-black p-2 rounded-lg border border-[#333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus:border-red-500 transition-colors"
+                className={`w-full bg-black p-2 rounded-lg border border-[#333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus:border-red-500 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-describedby={f === 'anilistId' ? 'anilistId-hint' : null}
               />
               {f === 'anilistId' && (
@@ -114,9 +115,17 @@ export default function Manual() {
       </form>
       <div aria-live="polite" aria-atomic="true">
         {status && (
-          <p className="mt-3 text-gray-300" role="status">
-            {status}
-          </p>
+          <div
+            className={`mt-4 p-4 rounded-lg border ${
+              status.type === 'error' ? 'bg-red-900/50 text-red-200 border-red-800' :
+              status.type === 'success' ? 'bg-green-900/50 text-green-200 border-green-800' :
+              'bg-[#111] text-gray-300 border-[#333]'
+            }`}
+            role={status.type === 'error' ? 'alert' : 'status'}
+          >
+            {status.type === 'error' && <strong>Error: </strong>}
+            {status.message}
+          </div>
         )}
       </div>
     </div>
