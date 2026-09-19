@@ -89,7 +89,8 @@ export default function Manual() {
                 aria-required={isRequired}
                 placeholder={placeholders[f]}
                 ref={f === 'anilistId' ? firstInputRef : null}
-                className="w-full bg-black p-2 rounded-lg border border-[#333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus:border-red-500 transition-colors"
+                disabled={loading}
+                className="w-full bg-black p-2 rounded-lg border border-[#333] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus:border-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-describedby={f === 'anilistId' ? 'anilistId-hint' : null}
               />
               {f === 'anilistId' && (
@@ -114,7 +115,10 @@ export default function Manual() {
       </form>
       <div aria-live="polite" aria-atomic="true">
         {status && (
-          <p className="mt-3 text-gray-300" role="status">
+          <p
+            className={`mt-3 ${status.startsWith('Failed') ? 'text-red-400' : status.startsWith('Saved') ? 'text-green-400' : 'text-blue-400'}`}
+            role={status.startsWith('Failed') ? "alert" : "status"}
+          >
             {status}
           </p>
         )}
